@@ -1,78 +1,78 @@
-# /nep-docx — Gerar ou rever DOCX segundo NEP INV 003 + IGA 2(B)
+# /nep-docx — Generate or revise DOCX according to NEP INV 003 + IGA 2(B)
 
-Guia Claude para gerar, rever ou corrigir documentos Word (.docx) segundo
-as normas do IUM: NEP INV 003 (A3) e IGA 2(B) Anexo D.
+Guide for Claude to generate, revise or correct Word (.docx) documents according to
+IUM standards: NEP INV 003 (A3) and IGA 2(B) Annex D.
 
-## Hierarquia normativa
+## Normative hierarchy
 
-IGA 2(B) > FAV > NEP INV 003 — em caso de conflito, IGA 2(B) prevalece.
+IGA 2(B) > FAV > NEP INV 003 — in case of conflict, IGA 2(B) prevails.
 
-## Formatação obrigatória (NEP INV 003 + IGA 2(B))
+## Mandatory formatting (NEP INV 003 + IGA 2(B))
 
-| Elemento | Valor |
-|----------|-------|
-| Fonte | Times New Roman 12pt |
-| Espaçamento | 1,5 linhas |
-| Margem esq. | 3 cm |
-| Margem dir. | 2,5 cm |
-| Margem sup./inf. | 2,5 cm |
-| Parágrafo | Sem espaço entre §§; 1ª linha recuada 1 cm |
-| Cabeçalho/Rodapé | Distância 1,5 cm |
-| Classificação | Topo E fundo de cada página |
-| Paginação | Romano (pré-texto) → Árabe (corpo) → Anx X-N (anexos) |
+| Element | Value |
+|---------|-------|
+| Font | Times New Roman 12pt |
+| Spacing | 1.5 lines |
+| Left margin | 3 cm |
+| Right margin | 2.5 cm |
+| Top/bottom margin | 2.5 cm |
+| Paragraph | No space between paragraphs; 1st line indented 1 cm |
+| Header/Footer | Distance 1.5 cm |
+| Classification | Top AND bottom of each page |
+| Pagination | Roman (pre-text) → Arabic (body) → Anx X-N (annexes) |
 
-## Estrutura do trabalho escolar IUM
+## IUM academic paper structure
 
 ```
-Capa (sem nº de página)
-Folha de rosto (sem nº de página)
-[Classificação se aplicável]
-Declaração de Honra
-Agradecimentos (opcional)
-Resumo (PT) + Abstract (EN)  → i, ii, ...
-Índice Geral                  → iii, ...
-Índice de Figuras/Tabelas
-Lista de Abreviaturas
-Introdução                    → 1, 2, ...
-Capítulos
-Conclusão
-Referências Bibliográficas
-Anexos                        → Anx A-1, Anx A-2, Anx B-1, ...
-Apêndices                     → Apd A-1, ...
+Cover page (no page number)
+Title page (no page number)
+[Classification if applicable]
+Declaration of Honour
+Acknowledgements (optional)
+Abstract (PT) + Abstract (EN)  → i, ii, ...
+Table of Contents               → iii, ...
+List of Figures/Tables
+List of Abbreviations
+Introduction                    → 1, 2, ...
+Chapters
+Conclusion
+References
+Annexes                         → Anx A-1, Anx A-2, Anx B-1, ...
+Appendices                      → Apd A-1, ...
 ```
 
-## Estilos Word obrigatórios
+## Mandatory Word styles
 
-- `Heading 1` → Capítulo (TNR 12pt, bold, numerado: 1., 2., ...)
-- `Heading 2` → Secção (TNR 12pt, bold, numerado: 1.1., 1.2., ...)
-- `Heading 3` → Subsecção (TNR 12pt, bold itálico, numerado: 1.1.1., ...)
-- Corpo de texto → Normal (TNR 12pt, 1,5 linhas)
-- Notas de rodapé → TNR 10pt, espaçamento simples
-- Legendas de figuras/tabelas → TNR 9pt, centrado, abaixo do elemento
+- `Heading 1` → Chapter (TNR 12pt, bold, numbered: 1., 2., ...)
+- `Heading 2` → Section (TNR 12pt, bold, numbered: 1.1., 1.2., ...)
+- `Heading 3` → Subsection (TNR 12pt, bold italic, numbered: 1.1.1., ...)
+- Body text → Normal (TNR 12pt, 1.5 lines)
+- Footnotes → TNR 10pt, single spacing
+- Figure/table captions → TNR 9pt, centred, below the element
 
-## Procedimento para geração
+## Generation procedure
 
-1. Confirma o fonte de conteúdo (ficheiro .md, texto fornecido, ou ficheiro existente)
-2. Identifica o projecto e o template aplicável (EEM/CPOS-M ou outro)
-3. Verifica se existe `generate_docx.py` no projecto — se sim, usa-o
-4. Se não existe script, usa python-docx para gerar respeitando a formatação acima
-5. Valida: contagem de palavras, secções obrigatórias, paginação, classificação
+1. Confirm the content source (.md file, provided text, or existing file)
+2. Identify the project and applicable template (EEM/CPOS-M or other)
+3. Check if `generate_docx.py` exists in the project — if so, use it
+4. If no script exists, use python-docx to generate respecting the formatting above
+5. Validate: word count, mandatory sections, pagination, classification
 
-## Procedimento para revisão de DOCX existente
+## DOCX revision procedure
 
-1. Abre o ficheiro e verifica margens, fonte, espaçamento
-2. Verifica paginação por secção (romano/árabe/anexo)
-3. Verifica cabeçalhos e rodapés com classificação
-4. Verifica referências bibliográficas (→ usar /apa-citation para cada entrada)
-5. Reporta desvios com referência à norma violada (IGA 2(B) §X ou NEP INV 003 §X)
+1. Open the file and check margins, font, spacing
+2. Check pagination by section (roman/arabic/annex)
+3. Check headers and footers with classification
+4. Check bibliographic references (→ use /apa-citation for each entry)
+5. Report deviations with reference to the violated standard (IGA 2(B) §X or NEP INV 003 §X)
 
-## Limites de palavras (trabalhos CPOS-M)
+## Word limits (CPOS-M papers)
 
-- EEM: 3000 ± 500 palavras no corpo (Introdução → Conclusão, excluindo referências e anexos)
-- TIG/outros: verificar FAV do curso específico
+- EEM: 3000 ± 500 words in body (Introduction → Conclusion, excluding references and annexes)
+- TIG/other: check course-specific FAV
 
-## Notas
+## Notes
 
-- Figuras e tabelas numeradas sequencialmente (Figura 1, Figura 2, ...)
-- Tabelas com header repeat em quebras de página (python-docx: `tbl_header=True`)
-- Rodapé de anexo: "Anx X-N" alinhado à direita, página relativa ao anexo
+- Figures and tables numbered sequentially (Figure 1, Figure 2, ...)
+- Tables with header repeat on page breaks (python-docx: `tbl_header=True`)
+- Annex footer: "Anx X-N" right-aligned, page relative to the annex

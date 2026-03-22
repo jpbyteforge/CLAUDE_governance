@@ -1,52 +1,52 @@
-# /apa-citation — Formatar referência APA 7ª edição (NEP INV 003)
+# /apa-citation — Format APA 7th edition reference (NEP INV 003)
 
-Dado os dados de uma fonte, formata a referência bibliográfica segundo APA 7ª edição
-conforme exigido pela NEP INV 003 (A3) do IUM.
+Given source data, formats the bibliographic reference according to APA 7th edition
+as required by IUM's NEP INV 003 (A3).
 
-## Regras obrigatórias
+## Mandatory rules
 
-- Autores: Apelido, Inicial(is). — vírgula entre autores, & antes do último
-- Ano entre parênteses após autores: (2024).
-- Título de livro/relatório em *itálico*; título de artigo sem itálico
-- Título de revista/jornal em *itálico*
-- DOI ou URL no final quando disponível: https://doi.org/...
-- Entidades como autor: nome completo sem abreviatura na primeira ocorrência
-- Ordem da lista: alfabética pelo apelido do primeiro autor
-- Sem numeração — lista apenas com sangria francesa (hanging indent)
+- Authors: Surname, Initial(s). — comma between authors, & before the last
+- Year in parentheses after authors: (2024).
+- Book/report title in *italics*; article title without italics
+- Journal/newspaper title in *italics*
+- DOI or URL at the end when available: https://doi.org/...
+- Entities as author: full name without abbreviation on first occurrence
+- List order: alphabetical by first author's surname
+- No numbering — list with hanging indent only
 
-## Tipos suportados
+## Supported types
 
-**Livro:**
-Apelido, I. (Ano). *Título do livro: Subtítulo* (Xª ed.). Editora.
+**Book:**
+Surname, I. (Year). *Book title: Subtitle* (Xth ed.). Publisher.
 
-**Capítulo em livro organizado:**
-Apelido, I. (Ano). Título do capítulo. In I. Org (Ed.), *Título do livro* (pp. XX–XX). Editora.
+**Chapter in edited book:**
+Surname, I. (Year). Chapter title. In I. Editor (Ed.), *Book title* (pp. XX–XX). Publisher.
 
-**Artigo em revista:**
-Apelido, I., & Apelido2, I. (Ano). Título do artigo. *Nome da Revista*, *Vol*(nº), pp–pp. https://doi.org/...
+**Journal article:**
+Surname, I., & Surname2, I. (Year). Article title. *Journal Name*, *Vol*(no), pp–pp. https://doi.org/...
 
-**Relatório institucional:**
-Organização. (Ano). *Título do relatório* (Nº ref). Entidade publicadora.
+**Institutional report:**
+Organisation. (Year). *Report title* (Ref no). Publishing entity.
 
-**Tese/Dissertação:**
-Apelido, I. (Ano). *Título* [Tese de doutoramento/Dissertação de mestrado, Nome da Instituição]. Repositório.
+**Thesis/Dissertation:**
+Surname, I. (Year). *Title* [Doctoral thesis/Master's dissertation, Institution Name]. Repository.
 
-**Página web/documento online:**
-Apelido, I. (Ano, dia mês). *Título da página*. Nome do Site. URL
+**Web page/online document:**
+Surname, I. (Year, day month). *Page title*. Site Name. URL
 
-**Legislação/Normativo:**
-Designação completa do diploma. (Ano, dia de mês). *Diário da República*, nº série, pp–pp.
+**Legislation/Regulation:**
+Full designation of the legal instrument. (Year, day month). *Official Gazette*, no series, pp–pp.
 
-## Procedimento
+## Procedure
 
-1. Identifica o tipo de fonte com base nos dados fornecidos
-2. Aplica o template correspondente
-3. Se faltar informação obrigatória, indica `[DADO EM FALTA: campo]` em vez de inventar
-4. Apresenta a referência formatada pronta a copiar
-5. Se pedido múltiplas referências, ordena alfabeticamente
+1. Identify the source type from the data provided
+2. Apply the corresponding template
+3. If mandatory information is missing, indicate `[MISSING DATA: field]` instead of inventing
+4. Present the formatted reference ready to copy
+5. If multiple references requested, sort alphabetically
 
-## Notas IUM
+## IUM Notes
 
-- Citação no texto: (Apelido, Ano, p. X) para citação directa; (Apelido, Ano) para paráfrase
-- "et al." a partir do 3º autor na citação em texto; lista completa na bibliografia
-- Documentos classificados: adicionar nível de classificação no final entre colchetes
+- In-text citation: (Surname, Year, p. X) for direct quote; (Surname, Year) for paraphrase
+- "et al." from the 3rd author in in-text citation; full list in bibliography
+- Classified documents: add classification level at the end in square brackets

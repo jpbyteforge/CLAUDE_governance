@@ -15,27 +15,27 @@ TIER_MODEL = {
 }
 
 _SONNET = re.compile(
-    r"implementa|debug|corrig|refactor|testa|review|compar"
-    r"|analisa(?![\s\S]*(impacto|risco|trade|sistem))|infra|setup|configur|deploy"
+    r"implement|debug|fix|correct|refactor|test|review|compar"
+    r"|analys[ei](?![\s\S]*(impact|risk|trade|system))|infra|setup|configur|deploy"
     r"|backend|frontend|api|database|schema|query|optim|perform|secure",
     re.IGNORECASE,
 )
 _OPUS = re.compile(
-    r"arquitetura|arquitectura|architect|multi.?sistem|cross.?system"
-    r"|refactor[\s\S]*(todo|tudo|all|global|projet)|design[\s\S]*(system|arqui)"
-    r"|audit[ao]?[r ]|governa[çn]|converg|migra[\s\S]*(sistema|system|project)"
-    r"|integra[\s\S]*(entre|across|cross|multi)|depend[\s\S]*(graph|circular|cycle)"
-    r"|trade.?off|investig|reflete|refle[cxs]"
-    r"|analisa[\s\S]*(impacto|risco|trade|sistem|project)"
-    r"|avalia[\s\S]*(estrateg|sistem|impacto)|reestrutur|redesign"
-    r"|consolid[\s\S]*(sistem|modul|projet)|unific"
-    r"|planei?a[\s\S]*(estrateg|migra|sistem)"
-    r"|compara[\s\S]*(abordagen|approach|estrateg|sistem)"
+    r"architect|multi.?system|cross.?system"
+    r"|refactor[\s\S]*(all|global|project)|design[\s\S]*(system|arch)"
+    r"|audit|governance|converg|migrat[\s\S]*(system|project)"
+    r"|integrat[\s\S]*(between|across|cross|multi)|depend[\s\S]*(graph|circular|cycle)"
+    r"|trade.?off|investigat|reflect"
+    r"|analys[ei][\s\S]*(impact|risk|trade|system|project)"
+    r"|evaluat[\s\S]*(strateg|system|impact)|restructur|redesign"
+    r"|consolid[\s\S]*(system|modul|project)|unif"
+    r"|plan[\s\S]*(strateg|migrat|system)"
+    r"|compar[\s\S]*(approach|strateg|system)"
     r"|roadmap|blueprint|manifest"
-    r"|diagn[oó]stic[\s\S]*(profund|deep|root)"
-    r"|d[ií]vid[\s\S]*(t[eé]cnic|tech)|debt[\s\S]*(t[eé]cnic|tech)"
+    r"|diagnos[\s\S]*(deep|root)"
+    r"|tech.?debt|debt[\s\S]*(tech)"
     r"|complex[\s\S]*(debug|analy)"
-    r"|pr[ií]ncip[\s\S]*(design|solid|dry|separation)",
+    r"|principl[\s\S]*(design|solid|dry|separation)",
     re.IGNORECASE,
 )
 

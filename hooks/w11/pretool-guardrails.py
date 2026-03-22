@@ -28,15 +28,15 @@ def check_bash(command: str) -> None:
         return
     first = command.split()[0] if command.split() else ""
     if _BASH_READ.match(command):
-        block(f"Bloqueado: usar Read em vez de '{first}'.")
+        block(f"Blocked: use Read instead of '{first}'.")
     if _BASH_GREP.match(command):
-        block(f"Bloqueado: usar Grep em vez de '{first}'.")
+        block(f"Blocked: use Grep instead of '{first}'.")
     if _BASH_FIND.match(command) and not _BASH_FIND_OK.search(command):
-        block("Bloqueado: usar Glob em vez de find.")
+        block("Blocked: use Glob instead of find.")
     if _BASH_SED.match(command):
-        block("Bloqueado: usar Edit em vez de 'sed -i'.")
+        block("Blocked: use Edit instead of 'sed -i'.")
     if _BASH_AWK.match(command):
-        block("Bloqueado: usar Grep ou Edit em vez de awk.")
+        block("Blocked: use Grep or Edit instead of awk.")
 
 
 def check_write(file_path: str) -> None:
@@ -47,7 +47,7 @@ def check_write(file_path: str) -> None:
         with p.open(encoding="utf-8", errors="ignore") as fh:
             lines = sum(1 for _ in fh)
         if lines > 50:
-            block(f"Bloqueado: ficheiro existente com {lines} linhas. Usar Edit em vez de Write.")
+            block(f"Blocked: existing file with {lines} lines. Use Edit instead of Write.")
     except Exception:
         pass
 
@@ -57,13 +57,13 @@ def check_agent(tool_input: dict, session_id: str) -> None:
     subagent_type = tool_input.get("subagent_type", "")
     model_l       = model.lower()
 
-    # Haiku read-only: ilimitado
+    # Haiku read-only: unlimited
     if "haiku" in model_l or subagent_type in _READONLY_AGENTS:
         return
     if not session_id:
         return
 
-    # Opus conta duplo (custo elevado); Sonnet conta 1
+    # Opus counts double (high cost); Sonnet counts 1
     cost       = 2 if "opus" in model_l else 1
     max_write  = 10
     count_file = Path(tempfile.gettempdir()) / f"claude-agents-write-{session_id}"
@@ -74,7 +74,7 @@ def check_agent(tool_input: dict, session_id: str) -> None:
         except Exception:
             count = 0
     if count + cost > max_write:
-        block(f"Quota de subagents write insuficiente ({count}/{max_write}, custo={cost}). Usar Read/Glob/Grep directos.")
+        block(f"Insufficient write subagent quota ({count}/{max_write}, cost={cost}). Use Read/Glob/Grep directly.")
     count_file.write_text(str(count + cost))
 
 

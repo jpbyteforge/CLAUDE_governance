@@ -1,140 +1,140 @@
 ---
 name: audit-turnaround
-description: Auditoria operacional e turnaround de projectos. Diagnóstico causal, remoção de fricções reais, estabilização.
-argument-hint: [path-do-projecto]
+description: Operational audit and project turnaround. Causal diagnosis, removal of real friction, stabilisation.
+argument-hint: [project-path]
 ---
 
-Auditoria operacional ao projecto em $ARGUMENTS.
+Operational audit of the project at $ARGUMENTS.
 
-Fórmula: REENQUADRAR → MEDIR → DIAGNOSTICAR → INTERVIR → VALIDAR. Cada fase tem gate — sem o passar, não avançar.
+Formula: REFRAME → MEASURE → DIAGNOSE → INTERVENE → VALIDATE. Each phase has a gate — do not advance without passing it.
 
-Objectivo: melhorar outputs, reduzir risco, estabilizar. Melhorias sem impacto operacional mensurável são irrelevantes.
-
----
-
-FASE 0 — REENQUADRAR
-
-Lê CLAUDE.md, README, pyproject.toml e Makefile. Responde com factos:
-1. O projecto existe para quê?
-2. Qual é o output consumido por alguém?
-3. O que acontece se o sistema parar hoje?
-4. Baseline actual de funcionamento?
-
-Gate: 4 respostas concretas com referência a outputs reais.
+Objective: improve outputs, reduce risk, stabilise. Improvements without measurable operational impact are irrelevant.
 
 ---
 
-FASE 1 — MEDIR
+PHASE 0 — REFRAME
 
-Executa — não inferir resultados. Correr em paralelo tudo o que for independente.
+Read CLAUDE.md, README, pyproject.toml and Makefile. Answer with facts:
+1. What does the project exist for?
+2. What is the output consumed by someone?
+3. What happens if the system stops today?
+4. Current operational baseline?
 
-**1a. Estado do sistema**
-- Correr testes: N passed, N failed, N skipped, tempo
-- Contar ficheiros de output. Verificar timestamps — o sistema está vivo?
-- Ler últimos 1-3 registos de output do pipeline
+Gate: 4 concrete answers referencing real outputs.
 
-**1b. Arqueologia git**
+---
+
+PHASE 1 — MEASURE
+
+Execute — do not infer results. Run everything independent in parallel.
+
+**1a. System state**
+- Run tests: N passed, N failed, N skipped, time
+- Count output files. Check timestamps — is the system alive?
+- Read last 1-3 pipeline output records
+
+**1b. Git archaeology**
 - Hotspots: `git log --format=format: --name-only | sort | uniq -c | sort -rn | head -15`
-- Padrão de falhas: `git log --oneline --grep="fix\|bug\|crash\|broken" | head -10`
+- Failure pattern: `git log --oneline --grep="fix\|bug\|crash\|broken" | head -10`
 
-**1c. Anti-patterns** — grep em *.py excluindo tests/:
-- Excepções engolidas: `except.*pass`, `except.*continue`
-- Paths relativos: `Path("[^/]`
-- Incerteza: `TODO|FIXME|HACK|WORKAROUND|XXX`
-- Complexidade: wc -l top 10 maiores
+**1c. Anti-patterns** — grep in *.py excluding tests/:
+- Swallowed exceptions: `except.*pass`, `except.*continue`
+- Relative paths: `Path("[^/]`
+- Uncertainty: `TODO|FIXME|HACK|WORKAROUND|XXX`
+- Complexity: wc -l top 10 largest
 
-**1d. Espaço negativo** — o que DEVIA existir e não existe:
-- Logging nos caminhos de erro? Alertas de falha? Health check? Backup/recovery?
+**1d. Negative space** — what SHOULD exist but doesn't:
+- Logging on error paths? Failure alerts? Health check? Backup/recovery?
 
-Gate: tabela preenchida com dados medidos.
+Gate: table filled with measured data.
 
-| Dimensão | Estado (com evidência) |
-|----------|----------------------|
-| Funciona | |
-| Falha | |
-| Frágil | |
-| Não determinístico | |
-| Cobertura de testes | N/M passed (X%) em Xs |
-| Última execução | [timestamp] |
+| Dimension | State (with evidence) |
+|-----------|----------------------|
+| Works | |
+| Fails | |
+| Fragile | |
+| Non-deterministic | |
+| Test coverage | N/M passed (X%) in Xs |
+| Last run | [timestamp] |
 
 ---
 
-FASE 2 — DIAGNOSTICAR
+PHASE 2 — DIAGNOSE
 
-Classifica cada problema:
-- **A)** Bloqueador — impede entrega de valor
-- **B)** Risco latente — segurança, integridade, continuidade
-- **C)** Ineficiência com custo real
-- **D)** Dívida estética — NÃO entra no plano
+Classify each problem:
+- **A)** Blocker — prevents value delivery
+- **B)** Latent risk — safety, integrity, continuity
+- **C)** Inefficiency with real cost
+- **D)** Aesthetic debt — does NOT enter the plan
 
-D que causa A/B/C → reclassifica com justificação causal. Sem ficheiro:linha e impacto quantificável → não é achado, é opinião → elimina.
+D causing A/B/C → reclassify with causal justification. Without file:line and quantifiable impact → not a finding, it's an opinion → remove.
 
-Qualificação: [FACTO] (verificado), [INFERÊNCIA] (dedução), [NÃO CONFIRMADO] (sem evidência directa). Achados só [NÃO CONFIRMADO] → escalar como pergunta, não entram no plano.
+Qualification: [FACT] (verified), [INFERENCE] (deduction), [UNCONFIRMED] (no direct evidence). Findings only [UNCONFIRMED] → escalate as question, do not enter plan.
 
-Antes de classificar A/B, procurar evidência contrária.
+Before classifying A/B, look for contrary evidence.
 
-Formato:
+Format:
 ```
-[ID] [A/B/C] Título
-- Ficheiro: path:linha
-- Causa raiz: 1 frase
-- Impacto: o que falha, quem, frequência
-- Evidência: [FACTO/INFERÊNCIA/NÃO CONFIRMADO] + dados
+[ID] [A/B/C] Title
+- File: path:line
+- Root cause: 1 sentence
+- Impact: what fails, who, frequency
+- Evidence: [FACT/INFERENCE/UNCONFIRMED] + data
 ```
 
-Calibração: código feio que funciona ≠ problema. Código bonito que falha em silêncio = problema. Pergunta: "causa perda de valor, tempo ou confiança?"
+Calibration: ugly code that works ≠ problem. Pretty code that fails silently = problem. Ask: "does this cause loss of value, time or trust?"
 
-Gate: zero frases como "considerar", "poderia", "seria bom".
-
----
-
-FASE 3 — INTERVIR
-
-Max 7 intervenções, ordenadas por impacto operacional. >7 = má priorização.
-
-Para cada:
-1. Problema que resolve (ref ID)
-2. Ganho esperado (mensurável)
-3. Riscos introduzidos
-4. Reversibilidade
-5. Teste de necessidade: "o que acontece se NÃO fizermos isto?" → se "nada" → eliminar
-
-Propor alteração concreta (ficheiro, função, mudança). Sem reescritas totais, abstrações genéricas ou optimizações sem pressão real.
-
-Gate: cada intervenção passa teste de necessidade E tem ganho mensurável.
+Gate: zero phrases like "consider", "could", "would be good".
 
 ---
 
-FASE 4 — VALIDAR (se o dono aprovar)
+PHASE 3 — INTERVENE
 
-1. Correr testes — comparar com baseline
-2. Validar happy path end-to-end
-3. Forçar falha previsível — o sistema reage?
-4. Confirmar ganho real vs baseline com números
+Max 7 interventions, ordered by operational impact. >7 = poor prioritisation.
 
-Sem melhoria clara → reverter.
+For each:
+1. Problem it solves (ref ID)
+2. Expected gain (measurable)
+3. Risks introduced
+4. Reversibility
+5. Necessity test: "what happens if we do NOT do this?" → if "nothing" → remove
+
+Propose concrete change (file, function, change). No total rewrites, generic abstractions or optimisations without real pressure.
+
+Gate: each intervention passes necessity test AND has measurable gain.
 
 ---
 
-FASE 5 — ENCERRAR
+PHASE 4 — VALIDATE (if owner approves)
 
-Termina quando: sistema mais estável (demonstrado), riscos conhecidos, valor recuperado explícito. Decisão de encerramento é do dono.
+1. Run tests — compare against baseline
+2. Validate happy path end-to-end
+3. Force expected failure — does the system react?
+4. Confirm real gain vs baseline with numbers
+
+No clear improvement → revert.
+
+---
+
+PHASE 5 — CLOSE
+
+End when: system more stable (demonstrated), known risks documented, recovered value explicit. Closing decision belongs to the owner.
 
 ---
 
 Output:
 
-## Reenquadramento
-[4 respostas factuais]
+## Reframing
+[4 factual answers]
 
 ## Baseline
-[Tabela preenchida]
+[Filled table]
 
-## Diagnóstico
-[Achados A/B/C com formato standard]
+## Diagnosis
+[A/B/C findings with standard format]
 
-## Plano de Intervenção
-[Max 7, ordenadas por impacto]
+## Intervention Plan
+[Max 7, ordered by impact]
 
-## Estado Actual vs Alvo
-[Tabela comparativa]
+## Current State vs Target
+[Comparative table]

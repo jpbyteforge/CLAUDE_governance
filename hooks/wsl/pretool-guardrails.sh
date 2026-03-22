@@ -36,11 +36,11 @@ case "$TOOL_NAME" in
 
         case "$FIRST_WORD" in
             cat|head|tail)
-                echo "Bloqueado: usar Read em vez de '$FIRST_WORD'." >&2
+                echo "Blocked: use Read instead of '$FIRST_WORD'." >&2
                 exit 2
                 ;;
             grep|rg|egrep|fgrep)
-                echo "Bloqueado: usar Grep em vez de '$FIRST_WORD'." >&2
+                echo "Blocked: use Grep instead of '$FIRST_WORD'." >&2
                 exit 2
                 ;;
             find)
@@ -48,18 +48,18 @@ case "$TOOL_NAME" in
                 if echo "$COMMAND" | grep -qE '(-delete|-exec|xargs)'; then
                     exit 0
                 fi
-                echo "Bloqueado: usar Glob em vez de find." >&2
+                echo "Blocked: use Glob instead of find." >&2
                 exit 2
                 ;;
             sed)
                 # Only block in-place editing
                 if echo "$COMMAND" | grep -qE 'sed\s+(-i|--in-place)'; then
-                    echo "Bloqueado: usar Edit em vez de 'sed -i'." >&2
+                    echo "Blocked: use Edit instead of 'sed -i'." >&2
                     exit 2
                 fi
                 ;;
             awk)
-                echo "Bloqueado: usar Grep ou Edit em vez de awk." >&2
+                echo "Blocked: use Grep or Edit instead of awk." >&2
                 exit 2
                 ;;
         esac
@@ -70,7 +70,7 @@ case "$TOOL_NAME" in
         if [ -n "$FILE_PATH" ] && [ -f "$FILE_PATH" ]; then
             LINE_COUNT=$(wc -l < "$FILE_PATH" 2>/dev/null || echo 0)
             if [ "$LINE_COUNT" -gt 50 ]; then
-                echo "Bloqueado: ficheiro existente com ${LINE_COUNT} linhas. Usar Edit (diff) em vez de Write (ficheiro inteiro)." >&2
+                echo "Blocked: existing file with ${LINE_COUNT} lines. Use Edit (diff) instead of Write (full file)." >&2
                 exit 2
             fi
         fi
@@ -94,7 +94,7 @@ case "$TOOL_NAME" in
         [ -f "$COUNT_FILE" ] && COUNT=$(cat "$COUNT_FILE" 2>/dev/null)
 
         if [ "$COUNT" -ge "$MAX_WRITE_AGENTS" ]; then
-            echo "Limite de subagents de escrita atingido ($COUNT/$MAX_WRITE_AGENTS). Usar subagent Haiku (read-only) ou resolver inline." >&2
+            echo "Write subagent quota reached ($COUNT/$MAX_WRITE_AGENTS). Use Haiku subagent (read-only) or resolve inline." >&2
             exit 2
         fi
 

@@ -1,30 +1,30 @@
-## Tier — resposta ao hook
+## Tier — hook response
 
-Cada prompt recebe `[MODEL_TIER] TIER | /model MODEL_ID` via hook.
+Each prompt receives `[MODEL_TIER] TIER | /model MODEL_ID` via hook.
 
-- Tier recomendado < modelo activo → primeira linha: `Recomendo /model <id> para esta tarefa.`
-- Tier recomendado ≥ modelo activo → silêncio.
+- Recommended tier < active model → first line: `Recommend /model <id> for this task.`
+- Recommended tier ≥ active model → silence.
 
-Binário. Sem excepções.
+Binary. No exceptions.
 
-## Ferramentas — ordem de preferência
+## Tools — preference order
 
-- Grep primeiro, depois Read com `offset`/`limit`. Nunca ler ficheiros inteiros para encontrar uma função.
-- Ficheiros >200 linhas: sempre `offset`/`limit` no Read.
-- Tool calls independentes: sempre em paralelo.
-- Tarefas >3 ficheiros: Plan mode antes de implementar.
+- Grep first, then Read with `offset`/`limit`. Never read entire files to find a function.
+- Files >200 lines: always use `offset`/`limit` in Read.
+- Independent tool calls: always in parallel.
+- Tasks >3 files: Plan mode before implementing.
 
 ## Subagents
 
-| Tipo | Modelo | Quota/sessão |
-|------|--------|-------------|
-| Pesquisa / read-only | `haiku` | ilimitado |
-| Escrita de código | `sonnet` mínimo | 1 |
-| Contraditório / arquitectura | `opus` | 2 |
+| Type | Model | Quota/session |
+|------|-------|--------------|
+| Research / read-only | `haiku` | unlimited |
+| Code writing | `sonnet` minimum | 1 |
+| Adversarial / architecture | `opus` | 2 |
 | **Total write** | | **10** |
 
-## Contexto — não carregar preventivamente
+## Context — do not load preemptively
 
-- Não ler CHANGELOG, README, ficheiros adjacentes sem evidência de relevância.
-- Não ler testes antes de os correr — correr primeiro, ler só se falharem.
-- Não ler git log/blame sem necessidade concreta.
+- Do not read CHANGELOG, README, adjacent files without evidence of relevance.
+- Do not read tests before running them — run first, read only if they fail.
+- Do not read git log/blame without concrete need.

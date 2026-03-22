@@ -1,75 +1,75 @@
 ---
 name: contraditorio
-description: Análise adversarial/contraditório a uma análise prévia. Lança subagent com modelo diferente para criticar conclusões, expor ângulos mortos e identificar riscos subestimados.
-argument-hint: [contexto opcional]
+description: Adversarial analysis / rebuttal of a prior analysis. Launches a subagent with a different model to critique conclusions, expose blind spots and identify underestimated risks.
+argument-hint: [optional context]
 ---
 
-Executa uma análise de contraditório à última análise ou resposta relevante na conversa.
+Execute an adversarial rebuttal of the last relevant analysis or response in the conversation.
 
 <contraditorio_protocol>
 
-## Quando aplicar
+## When to apply
 
-Aplica contraditório apenas quando:
-- A análise original envolve decisões de risco moderado ou alto
-- Há trade-offs não triviais
-- O utilizador pediu explicitamente `/contraditorio`
+Apply rebuttal only when:
+- The original analysis involves moderate or high-risk decisions
+- There are non-trivial trade-offs
+- The user explicitly requested `/contraditorio`
 
-Não aplicar a: formatação, boilerplate, perguntas factuais simples, tarefas mecânicas.
+Do not apply to: formatting, boilerplate, simple factual questions, mechanical tasks.
 
-## Execução
+## Execution
 
-1. **Identificar o alvo**: localiza a análise/resposta mais recente na conversa que constitui o alvo do contraditório. Se $ARGUMENTS contiver contexto adicional, incorpora-o.
+1. **Identify the target**: locate the most recent analysis/response in the conversation that constitutes the rebuttal target. If $ARGUMENTS contains additional context, incorporate it.
 
-2. **Lançar subagent adversarial** com modelo diferente do usado na análise original:
-   - Se análise original foi Haiku → subagent Sonnet
-   - Se análise original foi Sonnet → subagent Haiku ou Opus
-   - Se análise original foi Opus → subagent Sonnet
+2. **Launch adversarial subagent** with a different model than the one used in the original analysis:
+   - If original analysis was Haiku → subagent Sonnet
+   - If original analysis was Sonnet → subagent Haiku or Opus
+   - If original analysis was Opus → subagent Sonnet
 
-3. **Prompt do subagent** — usar exactamente esta estrutura:
-
-```
-Actua como crítico adversarial. A tua função é encontrar falhas, não confirmar.
-
-## Análise a criticar
-{inserir análise original}
-
-## Instruções
-Identifica com evidência concreta:
-1. Conclusões não suportadas ou exageradas
-2. Alternativas ignoradas (pelo menos 3)
-3. Custos e riscos subestimados
-4. Casos onde a proposta é contraproducente
-5. Vieses da própria análise (confirmação, novidade, ancoragem, etc.)
-
-Regras:
-- Critica a acuidade, não a retórica. Objecções devem ser específicas e falsificáveis.
-- Não sejas diplomático, mas cada crítica deve ter substância — sem ruído retórico.
-- Se a análise original está correcta num ponto, diz-o explicitamente. Não forces objecções artificiais.
-- Termina com um veredicto: em que condições a análise original é válida e em que condições falha.
-
-Responde em português (PT-PT).
-```
-
-4. **Apresentar resultado** ao utilizador com esta estrutura:
+3. **Subagent prompt** — use exactly this structure:
 
 ```
-## Contraditório
+Act as an adversarial critic. Your function is to find flaws, not to confirm.
 
-{output do subagent — integral, sem filtrar}
+## Analysis to critique
+{insert original analysis}
+
+## Instructions
+Identify with concrete evidence:
+1. Unsupported or exaggerated conclusions
+2. Ignored alternatives (at least 3)
+3. Underestimated costs and risks
+4. Cases where the proposal is counterproductive
+5. Biases in the analysis itself (confirmation, novelty, anchoring, etc.)
+
+Rules:
+- Critique accuracy, not rhetoric. Objections must be specific and falsifiable.
+- Do not be diplomatic, but each critique must have substance — no rhetorical noise.
+- If the original analysis is correct on a point, say so explicitly. Do not force artificial objections.
+- End with a verdict: under what conditions the original analysis is valid and under what conditions it fails.
+
+Reply in English.
+```
+
+4. **Present result** to the user with this structure:
+
+```
+## Rebuttal
+
+{subagent output — complete, unfiltered}
 
 ---
 
-## Reconciliação
+## Reconciliation
 
-{síntese em 3-5 pontos: onde a análise original se mantém, onde cede, e o que muda na recomendação final}
+{synthesis in 3-5 points: where the original analysis holds, where it yields, and what changes in the final recommendation}
 ```
 
-## Princípios operacionais
+## Operational principles
 
-- **Acuidade > agressividade**: objecções específicas e falsificáveis, não retórica combativa
-- **Não fingir independência**: reconhecer que o contraditório partilha limitações com a análise original (mesma base factual, mesma janela de contexto)
-- **Não criar falsa confiança**: o contraditório cobre mais terreno, não cobre todo o terreno. Dizer explicitamente o que fica por verificar
-- **Verificação factual é separada**: o contraditório critica lógica e enquadramento, não verifica dados. Se a análise depende de factos, a verificação factual é uma tarefa à parte
+- **Accuracy > aggression**: specific and falsifiable objections, not combative rhetoric
+- **Do not fake independence**: acknowledge that the rebuttal shares limitations with the original analysis (same factual base, same context window)
+- **Do not create false confidence**: the rebuttal covers more ground, not all ground. State explicitly what remains unverified
+- **Fact-checking is separate**: the rebuttal critiques logic and framing, not data. If the analysis depends on facts, fact-checking is a separate task
 
 </contraditorio_protocol>
