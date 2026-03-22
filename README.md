@@ -26,8 +26,6 @@ shared/                     # OS-agnostic — deployed to both platforms
 ├── commands/               # On-demand skills (loaded when invoked)
 │   ├── audit-turnaround.md # Operational audit protocol
 │   ├── contraditorio.md    # Adversarial analysis
-│   ├── apa-citation.md     # APA 7th ed formatting
-│   └── nep-docx.md         # DOCX generation per IUM norms
 └── skills/
     └── neon-postgres/      # Neon Serverless Postgres guide
 
@@ -87,7 +85,7 @@ Both scripts copy shared files to `~/.claude/` and platform-specific files from 
 
 ```
 manifesto (doctrine, read-only)
-  └→ protocol (projet-governance/CLAUDE.md)
+  └→ protocol ({governance}/CLAUDE.md)
        └→ portfolio (projects/CLAUDE.md)
             └→ project ({proj}/CLAUDE.md)
 ```

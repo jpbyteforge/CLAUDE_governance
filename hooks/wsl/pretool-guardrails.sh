@@ -9,11 +9,6 @@
 
 set -uo pipefail
 
-# Fast-path: skip guardrails in static/doc-only projects
-case "$PWD" in
-    */pon|*/pon/*) exit 0 ;;
-esac
-
 INPUT=$(cat)
 command -v jq &>/dev/null || exit 0
 

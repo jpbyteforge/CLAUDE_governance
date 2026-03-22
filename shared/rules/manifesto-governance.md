@@ -1,15 +1,12 @@
 ---
-description: Governance rules for Claude — derived from the authoritative manifesto
-source: ai-governance/projet-governance/manifesto_governacao_ia.md
+description: Governance rules for Claude — operational distillation of the authoritative AI governance manifesto
 ---
 
 # Governance — Operational Rules
 
-Authoritative source (humans): `ai-governance/projet-governance/manifesto_governacao_ia.md`. Consult in case of ambiguity.
-
 ## Hierarchy
 
-manifesto > protocol (`projet-governance/CLAUDE.md`) > portfolio (`projects/CLAUDE.md`) > project (`{proj}/CLAUDE.md`). Conflict → higher level prevails.
+manifesto > protocol (project-root `CLAUDE.md`) > portfolio > project. Conflict → higher level prevails.
 
 ## Rules
 
