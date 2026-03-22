@@ -1,0 +1,21 @@
+# Logs e cache
+*.log
+cache/
+stats-cache.json
+session-env/
+sessions/
+shell-snapshots/
+telemetry/
+paste-cache/
+downloads/
+debug/
+ide/
+history.jsonl
+todos/
+tasks/
+plans/
+backups/
+file-history/
+
+# Credenciais locais
+settings.local.json
