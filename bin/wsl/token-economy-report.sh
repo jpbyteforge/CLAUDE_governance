@@ -1,7 +1,7 @@
 #!/bin/bash
 # token-economy-report.sh — Audit token economy decisions
 
-LOG="/home/jorge/.claude/token-economy.log"
+LOG="$HOME/.claude/token-economy.log"
 
 usage() {
     echo "Usage: token-economy-report [status|escalations|summary|daily]"

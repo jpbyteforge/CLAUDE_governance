@@ -17,5 +17,6 @@ plans/
 backups/
 file-history/
 
-# Credenciais locais
-settings.local.json
+# Config com paths pessoais — usar *.example.json como template
+settings/**/settings.json
+settings/**/settings.local.json

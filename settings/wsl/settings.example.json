@@ -14,7 +14,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/jorge/.claude/hooks/check-model-tier.sh"
+            "command": "$HOME/.claude/hooks/check-model-tier.sh"
           }
         ]
       }
@@ -24,7 +24,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/jorge/.claude/hooks/pretool-guardrails.sh"
+            "command": "$HOME/.claude/hooks/pretool-guardrails.sh"
           }
         ]
       }
@@ -34,14 +34,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "jq -c '{ts: (now | todate), source: .source, file: .file_path}' >> /home/jorge/.claude/config-audit.log"
+            "command": "jq -c '{ts: (now | todate), source: .source, file: .file_path}' >> $HOME/.claude/config-audit.log"
           }
         ]
       }
     ]
   },
-  "enabledPlugins": {
-    "github@claude-plugins-official": true
-  },
-  "model": "opus"
+  "model": "sonnet"
 }

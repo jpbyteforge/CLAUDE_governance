@@ -44,7 +44,7 @@ GLOBAL_TIER="$TIER"
 GLOBAL_MODEL="$MODEL"
 
 # Apply local CLAUDE.md overrides (if exist)
-RESOLVER="/home/jorge/.claude/hooks/resolve-model-policy.sh"
+RESOLVER="$HOME/.claude/hooks/resolve-model-policy.sh"
 if [ -x "$RESOLVER" ]; then
     RESOLVED=$("$RESOLVER" "$TIER" "$MODEL" 2>/dev/null)
     if [ -n "$RESOLVED" ]; then
@@ -54,7 +54,7 @@ if [ -x "$RESOLVER" ]; then
 fi
 
 # Log decision to audit trail
-AUDIT_LOG="/home/jorge/.claude/token-economy.log"
+AUDIT_LOG="$HOME/.claude/token-economy.log"
 if [ -w "$(dirname "$AUDIT_LOG")" ]; then
     {
         printf '%s | %s | %s→%s | %.80s\n' \

@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(python:*)",
+      "Bash(git:*)",
+      "Bash(npm:*)",
+      "Bash(gh:*)",
+      "WebSearch",
+      "Edit",
+      "Write",
+      "Read",
+      "Glob",
+      "Grep",
+      "Agent",
+      "NotebookEdit"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)"
+    ]
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"%USERPROFILE%\\.claude\\hooks\\check-model-tier.py\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"%USERPROFILE%\\.claude\\hooks\\pretool-guardrails.py\""
+          }
+        ]
+      }
+    ],
+    "ConfigChange": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python -c \"import json,sys,datetime; d=json.load(sys.stdin); open(str(__import__('pathlib').Path.home()/'.claude'/'config-audit.log'),'a').write(json.dumps({'ts':datetime.datetime.utcnow().isoformat(),'source':d.get('source'),'file':d.get('file_path')})+chr(10))\""
+          }
+        ]
+      }
+    ]
+  },
+  "model": "sonnet"
+}
