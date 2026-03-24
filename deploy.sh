@@ -5,7 +5,6 @@ set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
 TARGET="$HOME/.claude"
-PROJECT_RULES="$HOME/projects/.claude/rules"
 DRY_RUN=false
 [[ "${1:-}" == "--dry-run" ]] && DRY_RUN=true
 
@@ -24,8 +23,8 @@ deploy() {
 deploy "$REPO_DIR/shared/CLAUDE.md"          "$TARGET/CLAUDE.md"
 deploy "$REPO_DIR/shared/policy-limits.json" "$TARGET/policy-limits.json"
 
-# Rules → project level
-deploy "$REPO_DIR/shared/rules/manifesto-governance.md" "$PROJECT_RULES/manifesto-governance.md"
+# Rules
+deploy "$REPO_DIR/shared/rules/manifesto-governance.md" "$TARGET/rules/manifesto-governance.md"
 
 # Skills
 for f in "$REPO_DIR"/shared/skills/*/SKILL.md; do
@@ -44,9 +43,9 @@ for f in "$REPO_DIR"/hooks/wsl/*; do
     deploy "$f" "$TARGET/hooks/$(basename "$f")"
 done
 
-# Settings (WSL)
-deploy "$REPO_DIR/settings/wsl/settings.json"       "$TARGET/settings.json"
-deploy "$REPO_DIR/settings/wsl/settings.local.json"  "$TARGET/settings.local.json"
+# Settings (WSL) — deploy as examples only; never overwrite live settings
+[ -f "$REPO_DIR/settings/wsl/settings.json" ]       && deploy "$REPO_DIR/settings/wsl/settings.json"       "$TARGET/settings.example.json"
+[ -f "$REPO_DIR/settings/wsl/settings.local.json" ] && deploy "$REPO_DIR/settings/wsl/settings.local.json" "$TARGET/settings.local.example.json"
 
 # Bin (WSL)
 for f in "$REPO_DIR"/bin/wsl/*; do

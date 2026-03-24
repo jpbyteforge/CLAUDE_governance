@@ -23,12 +23,12 @@ PROMPT_LEN=${#PROMPT}
 TIER="HAIKU"
 
 # Escalate to SONNET: medium complexity, implementation, debugging
-if echo "$PROMPT_LOWER" | grep -qE '(implement|debug|fix|correct|refactor|test|review|compar|analys[ei]|infra|setup|configur|deploy|backend|frontend|api|database|schema|query|optim|perform|secure)'; then
+if echo "$PROMPT_LOWER" | grep -qE '(implementa|debug|corrig|refactor|testa|review|compar|analisa|infra|setup|configur|deploy|backend|frontend|api|database|schema|query|optim|perform|secure)'; then
     TIER="SONNET"
 fi
 
 # Escalate to OPUS: architecture, cross-system, governance, deep analysis
-if echo "$PROMPT_LOWER" | grep -qE '(architect|multi.?system|cross.?system|refactor.*(all|global|project)|design.*(system|arch)|audit|governance|converg|migrat.*(system|project)|integrat.*(between|across|cross|multi)|depend.*(graph|circular|cycle)|trade.?off|investigat|reflect|analys[ei].*(impact|risk|trade|system|project)|evaluat.*(strateg|system|impact)|restructur|redesign|consolid.*(system|modul|project)|unif|plan.*(strateg|migrat|system)|compar.*(approach|strateg|system)|roadmap|blueprint|manifest|diagnos.*(deep|root)|tech.?debt|debt.*(tech)|complex.*(debug|analy)|principl.*(design|solid|dry|separation))'; then
+if echo "$PROMPT_LOWER" | grep -qE '(arquitetura|arquitectura|architect|multi.?sistem|cross.?system|refactor.*(todo|tudo|all|global|projet)|design.*(system|arqui)|audit|governa|converg|migra.*(sistema|system|project)|integra.*(entre|across|cross|multi)|depend.*(graph|circular|cycle)|trade.?off|investig|reflete|analisa.*(impacto|risco|trade|sistem|project)|avalia.*(estrateg|sistem|impacto)|reestrutur|redesign|consolid.*(sistem|modul|projet)|unific|planeia.*(estrateg|migra|sistem)|compara.*(abordagen|approach|estrateg|sistem)|roadmap|blueprint|manifest|diagn.*(profund|deep|root)|divida.*(tecnic|tech)|debt.*(tech)|complex.*(debug|analy)|princip.*(design|solid|dry|separation))'; then
     TIER="OPUS"
 fi
 

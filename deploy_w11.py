@@ -1,4 +1,4 @@
-"""Deploy CLAUDE_governance to %USERPROFILE%\.claude\ (Windows 11)
+"""Deploy CLAUDE_governance to %USERPROFILE%\\.claude\\ (Windows 11)
 Usage: python deploy_w11.py [--dry-run]
 """
 import shutil
@@ -21,11 +21,13 @@ def deploy(src: Path, dst: Path) -> None:
 
 # Shared
 deploy(REPO / "shared" / "CLAUDE.md", TARGET / "CLAUDE.md")
-deploy(REPO / "shared" / "policy-limits.json", TARGET / "policy-limits.json")
+_policy = REPO / "shared" / "policy-limits.json"
+if _policy.exists():
+    deploy(_policy, TARGET / "policy-limits.json")
 
 # Rules
 deploy(REPO / "shared" / "rules" / "manifesto-governance.md",
-       Path.home() / "projects" / ".claude" / "rules" / "manifesto-governance.md")
+       TARGET / "rules" / "manifesto-governance.md")
 
 # Skills
 for f in (REPO / "shared" / "skills").rglob("SKILL.md"):
@@ -40,8 +42,11 @@ for f in (REPO / "shared" / "commands").glob("*.md"):
 for f in (REPO / "hooks" / "w11").glob("*"):
     deploy(f, TARGET / "hooks" / f.name)
 
-# Settings (W11)
-deploy(REPO / "settings" / "w11" / "settings.json", TARGET / "settings.json")
+# Settings (W11) — deploy as example only; never overwrite live settings.json
+deploy(REPO / "settings" / "w11" / "settings.example.json", TARGET / "settings.example.json")
+
+# Stop hook
+deploy(REPO / "hooks" / "w11" / "session-end.py", TARGET / "hooks" / "session-end.py")
 
 # Bin (W11)
 for f in (REPO / "bin" / "w11").glob("*"):
