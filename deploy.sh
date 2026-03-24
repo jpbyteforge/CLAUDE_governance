@@ -20,7 +20,7 @@ deploy() {
 }
 
 # Shared
-deploy "$REPO_DIR/shared/CLAUDE.md"          "$TARGET/CLAUDE.md"
+deploy "$REPO_DIR/shared/CLAUDE.md"          "$TARGET/CLAUDE.example.md"
 deploy "$REPO_DIR/shared/policy-limits.json" "$TARGET/policy-limits.json"
 
 # Rules

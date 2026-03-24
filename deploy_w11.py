@@ -20,7 +20,7 @@ def deploy(src: Path, dst: Path) -> None:
 
 
 # Shared
-deploy(REPO / "shared" / "CLAUDE.md", TARGET / "CLAUDE.md")
+deploy(REPO / "shared" / "CLAUDE.md", TARGET / "CLAUDE.example.md")
 _policy = REPO / "shared" / "policy-limits.json"
 if _policy.exists():
     deploy(_policy, TARGET / "policy-limits.json")
