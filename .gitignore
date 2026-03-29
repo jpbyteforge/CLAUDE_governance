@@ -20,3 +20,24 @@ file-history/
 # Config com paths pessoais — usar *.example.json como template
 settings/**/settings.json
 settings/**/settings.local.json
+settings.local.json
+
+# Credenciais e segredos (tokens, API keys)
+.credentials.json
+config.json
+
+# Dados pessoais (identidade, contexto institucional)
+MEMORY.md
+projects/
+
+# Configs machine-specific (paths absolutos)
+.mcp.json
+playwright-mcp.config.json
+INSTALL.md
+
+# Runtime cache
+plugins/
+statsig/
+
+# Settings backup
+settings.json.bak

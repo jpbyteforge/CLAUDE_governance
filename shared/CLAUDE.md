@@ -23,6 +23,9 @@ Binary. No exceptions.
 | Adversarial / architecture | `opus` | 2 |
 | **Total write** | | **10** |
 
+Quota exhausted → stop and ask user before continuing.
+Simple tasks (edit/rename/commit/format): max 3 tool calls; reasoning ≤2 sentences.
+
 ## Context — do not load preemptively
 
 - Do not read CHANGELOG, README, adjacent files without evidence of relevance.

@@ -24,19 +24,28 @@ _READONLY_AGENTS = {"Explore"}
 
 def check_bash(command: str) -> None:
     command = command.strip()
-    if _COMPLEX.search(command):
-        return
-    first = command.split()[0] if command.split() else ""
-    if _BASH_READ.match(command):
-        block(f"Blocked: use Read instead of '{first}'.")
-    if _BASH_GREP.match(command):
-        block(f"Blocked: use Grep instead of '{first}'.")
-    if _BASH_FIND.match(command) and not _BASH_FIND_OK.search(command):
-        block("Blocked: use Glob instead of find.")
-    if _BASH_SED.match(command):
-        block("Blocked: use Edit instead of 'sed -i'.")
-    if _BASH_AWK.match(command):
-        block("Blocked: use Grep or Edit instead of awk.")
+    # Strip quoted strings to avoid false positives on keywords inside quotes
+    try:
+        stripped = re.sub(r"'[^']*'", '""', re.sub(r'"[^"]*"', '""', command))
+    except Exception:
+        stripped = command
+    # Split on unquoted pipes, logical operators, semicolons
+    segments = re.split(r'\s*(?:\|{1,2}|&&|;)\s*', stripped)
+    for segment in segments:
+        segment = segment.strip()
+        if not segment:
+            continue
+        first = segment.split()[0] if segment.split() else ""
+        if _BASH_READ.match(segment):
+            block(f"Blocked: use Read instead of '{first}'.")
+        if _BASH_GREP.match(segment):
+            block(f"Blocked: use Grep instead of '{first}'.")
+        if _BASH_FIND.match(segment) and not _BASH_FIND_OK.search(segment):
+            block("Blocked: use Glob instead of find.")
+        if _BASH_SED.match(segment):
+            block("Blocked: use Edit instead of 'sed -i'.")
+        if _BASH_AWK.match(segment):
+            block("Blocked: use Grep or Edit instead of awk.")
 
 
 def check_write(file_path: str) -> None:
@@ -78,6 +87,27 @@ def check_agent(tool_input: dict, session_id: str) -> None:
     count_file.write_text(str(count + cost))
 
 
+def check_governance_version() -> None:
+    """Warn if governance files in rules/ have mismatched versions."""
+    rules_dir = Path.home() / ".claude" / "rules"
+    if not rules_dir.exists():
+        return
+    versions = {}
+    for f in rules_dir.glob("*.md"):
+        try:
+            text = f.read_text(encoding="utf-8", errors="ignore")
+            for line in text.splitlines()[:10]:
+                if line.startswith("version:"):
+                    versions[f.name] = line.split(":", 1)[1].strip()
+                    break
+        except Exception:
+            pass
+    unique = set(versions.values())
+    if len(unique) > 1:
+        detail = ", ".join(f"{k}={v}" for k, v in sorted(versions.items()))
+        print(f"⚠️ Governance version mismatch: {detail}", file=sys.stderr)
+
+
 def main() -> None:
     try:
         data = json.loads(sys.stdin.read())
@@ -94,6 +124,9 @@ def main() -> None:
         check_write(tool_input.get("file_path", ""))
     elif tool_name == "Agent":
         check_agent(tool_input, session_id)
+
+    # Run governance integrity check on first tool call (lightweight)
+    check_governance_version()
 
     sys.exit(0)
 
