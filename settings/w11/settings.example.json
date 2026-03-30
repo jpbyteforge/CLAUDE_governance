@@ -18,13 +18,7 @@
     "deny": [
       "Read(./.env)",
       "Read(./.env.*)",
-      "Read(./secrets/**)",
-      "Write(~/.claude/CLAUDE.md)",
-      "Write(~/.claude/rules/**)",
-      "Write(~/.claude/hooks/**)",
-      "Edit(~/.claude/CLAUDE.md)",
-      "Edit(~/.claude/rules/**)",
-      "Edit(~/.claude/hooks/**)"
+      "Read(./secrets/**)"
     ]
   },
   "hooks": {
@@ -44,17 +38,6 @@
           {
             "type": "command",
             "command": "python \"%USERPROFILE%\\.claude\\hooks\\pretool-guardrails.py\""
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "matcher": "compact",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo \"[POST-COMPACT] Governance rules at ~/.claude/rules/ (invariants.md + rules.md). Read them if unsure about constraints. Epistemic markers [FACT]/[INFERENCE]/[UNCONFIRMED] mandatory. Fail-closed on ambiguity.\""
           }
         ]
       }
