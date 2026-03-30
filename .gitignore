@@ -41,3 +41,23 @@ statsig/
 
 # Settings backup
 settings.json.bak
+
+# Live deployed files (managed by deploy_w11.py, source in shared/)
+CLAUDE.md
+CLAUDE.example.md
+rules/
+reference/
+archive/
+commands/
+templates/
+skills/
+policy-limits.json
+settings.json
+settings.example.json
+scripts/
+bin/
+
+# Live hooks (source in hooks/w11/)
+hooks/check-model-tier.py
+hooks/pretool-guardrails.py
+hooks/session-end.py
