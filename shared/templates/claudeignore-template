@@ -1,0 +1,44 @@
+# .claudeignore template — copy to project root, adapt as needed
+# Global patterns common across projects
+
+# Build artifacts
+build/
+dist/
+out/
+*.min.js
+*.min.css
+
+# Dependencies
+node_modules/
+.gradle/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# IDE and editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Large binaries
+*.apk
+*.aab
+*.ipa
+*.zip
+*.tar.gz
+*.rar
+
+# Obsidian internals
+.obsidian/
+
+# Cache
+.cache/
+.parcel-cache/
+.next/

@@ -42,6 +42,17 @@
         ]
       }
     ],
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo \"[POST-COMPACT] Governance rules at ~/.claude/rules/ (invariants.md + rules.md). Read them if unsure about constraints. Epistemic markers [FACT]/[INFERENCE]/[UNCONFIRMED] mandatory. Fail-closed on ambiguity.\""
+          }
+        ]
+      }
+    ],
     "ConfigChange": [
       {
         "hooks": [

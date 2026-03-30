@@ -8,6 +8,12 @@ description: Operational governance rules in conditional WHEN/REQUIRE/DEFAULT fo
 
 # Rules — Operational Governance
 
+## Key Terms (full taxonomy: ~/.claude/reference/taxonomy.md)
+- **Sovereign Document**: CLAUDE.md, GOVERNANCE.md, rules/*, ADRs — prevails over code/config/output
+- **Forbidden Zone**: Directory/file where AI write is blocked (project-defined)
+- **ADR**: Architecture Decision Record — context, options, decision, consequences
+- **Fail-Closed**: No explicit rule → action blocked
+
 RULE-4: Forbidden Zones
 ```
 WHEN:  write_operation(target)

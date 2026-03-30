@@ -56,14 +56,20 @@ Where:
 
 ## Governance Scopes
 
-| Scope | Location | Precedence |
-|-------|----------|------------|
-| Global | `~/.claude/rules/` | Highest — cannot be overridden |
-| Portfolio | Multi-project guidance (optional) | High — extends global |
-| Project | `{project}/CLAUDE.md` | Medium — extends global+portfolio |
-| Session | Ephemeral (prompts, tasks) | Lowest — no governance authority |
+| Scope | Location | Claude Code Precedence | Governance Intent |
+|-------|----------|----------------------|-------------------|
+| Managed | `C:\Program Files\ClaudeCode\` | Highest — enforced, non-overridable | N/A (not in use) |
+| Project | `{project}/.claude/settings.json`, `{project}/CLAUDE.md` | High — overrides user settings | EXTENDS global, cannot CONTRADICT |
+| User/Global | `~/.claude/settings.json`, `~/.claude/rules/` | Lower than project | Baseline invariants + defaults |
+| Session | Ephemeral (prompts, tasks) | Lowest — no governance authority | No governance authority |
 
-Conflict: higher scope prevails. Lower scopes EXTEND (add rules) but cannot CONTRADICT higher.
+**Reality vs intent:** Claude Code gives project-level higher precedence than user-level.
+Our governance convention (projects EXTEND, never CONTRADICT global) is enforced by:
+1. **Hooks** (pretool-guardrails.py) — deterministic, mechanical enforcement
+2. **Convention** — project CLAUDE.md files explicitly declare `inherits: global.invariants`
+3. **Owner awareness** — solo user controls all projects
+
+For truly non-overridable rules, use managed settings or hook enforcement (not CLAUDE.md alone).
 
 ## Actor Roles
 
