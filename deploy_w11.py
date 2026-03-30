@@ -112,6 +112,17 @@ def do_deploy(manifest: dict) -> None:
                 if not mapping.get("optional"):
                     print(f"WARNING: source missing: {src}")
                 continue
+            # Merge prompt: if dst exists and differs from BOTH src and previous,
+            # the user may have customized it (e.g., live CLAUDE.md has System Map)
+            if dst.exists() and not _content_equal(src, dst, text_exts):
+                if dst.name in ("CLAUDE.md",):
+                    # Never overwrite live CLAUDE.md — it's user-customized
+                    if not DRY_RUN:
+                        print(f"  SKIP (user-customized): {dst}")
+                        print(f"    Review changes in: {src}")
+                    else:
+                        print(f"[dry-run] SKIP (user-customized): {dst}")
+                    continue
             if DRY_RUN:
                 print(f"[dry-run] {src} -> {dst}")
             else:
@@ -148,6 +159,71 @@ def do_verify(manifest: dict) -> None:
         ts_path = TARGET / ts
         if ts_path.exists():
             _drift.append(f"[ORPHAN]   {ts_path}  (should not exist - moved in v2.2)")
+
+    # Referential integrity: check that file paths in .md files resolve
+    _check_references(manifest)
+
+    # Sunset clause check
+    _check_sunsets()
+
+
+def _check_references(manifest: dict) -> None:
+    """Verify that file paths referenced in governance .md files resolve to real files."""
+    import re
+    # Only check governance files (rules, reference, archive), not skills
+    gov_dirs = ["rules", "reference", "archive", "commands"]
+    md_files = []
+    for d in gov_dirs:
+        p = REPO / "shared" / d
+        if p.exists():
+            md_files.extend(p.glob("*.md"))
+    # Also check the root CLAUDE.md
+    root_claude = REPO / "shared" / "CLAUDE.md"
+    if root_claude.exists():
+        md_files.append(root_claude)
+    # Patterns that look like internal file references
+    ref_pattern = re.compile(
+        r'(?:rules/|reference/|archive/|templates/|commands/|hooks/)'
+        r'[\w./-]+\.(?:md|py|json|sh)'
+    )
+    for md_file in md_files:
+        try:
+            content = md_file.read_text(encoding="utf-8", errors="ignore")
+        except Exception:
+            continue
+        for match in ref_pattern.finditer(content):
+            ref_path = match.group()
+            if not (REPO / ref_path).exists() and not (TARGET / ref_path).exists():
+                if not (REPO / "shared" / ref_path).exists():
+                    _drift.append(f"[REF-BROKEN] {md_file.name}: {ref_path}")
+
+
+def _check_sunsets() -> None:
+    """Check for expired sunset clauses."""
+    import datetime
+    sunset_file = REPO / "shared" / "sunset-clauses.json"
+    if not sunset_file.exists():
+        return
+    try:
+        clauses = json.loads(sunset_file.read_text(encoding="utf-8"))
+    except Exception:
+        return
+    today = datetime.date.today()
+    for clause in clauses.get("clauses", []):
+        expiry = clause.get("expiry")
+        rule_id = clause.get("rule_id", "unknown")
+        status = clause.get("status", "active")
+        if status != "active":
+            continue
+        try:
+            exp_date = datetime.date.fromisoformat(expiry)
+        except (ValueError, TypeError):
+            _drift.append(f"[SUNSET-BAD] {rule_id}: invalid expiry date '{expiry}'")
+            continue
+        if exp_date <= today:
+            _drift.append(f"[SUNSET-EXP] {rule_id}: expired {expiry} - review or close")
+        elif (exp_date - today).days <= 14:
+            _drift.append(f"[SUNSET-WARN] {rule_id}: expires {expiry} ({(exp_date - today).days}d remaining)")
 
 
 def do_reverse(manifest: dict) -> None:

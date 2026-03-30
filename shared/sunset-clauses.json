@@ -1,0 +1,13 @@
+{
+  "description": "Experimental rules and features with expiry dates (INV-7 enforcement)",
+  "clauses": [
+    {
+      "rule_id": "deploy-legacy-fallback",
+      "description": "Legacy hardcoded deploy mappings in deploy_w11.py (_legacy_deploy)",
+      "created": "2026-03-30",
+      "expiry": "2026-04-30",
+      "status": "active",
+      "action_on_expiry": "Remove _legacy_deploy() function from deploy_w11.py"
+    }
+  ]
+}

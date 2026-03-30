@@ -9,7 +9,7 @@ invariants and conditional rules, with human-readable intent comments.
 |------|---------|---------|
 | `rules/invariants.md` | 7 canonical premises (non-negotiable) | Rarely |
 | `rules/rules.md` | 5 operational rules + escape clause (WHEN/REQUIRE/DEFAULT) | Occasionally |
-| `rules/taxonomy.md` | Terms, inheritance model, governance scopes | When new concepts emerge |
+| `reference/taxonomy.md` | Terms, inheritance model, governance scopes | When new concepts emerge |
 | `reference/enforcement.md` | Map: what is automated (hooks) vs. convention-only | When hooks change |
 | `archive/manifesto-governance-v1.md` | Archived v1.0 prose version (rollback) | Never (frozen) |
 
