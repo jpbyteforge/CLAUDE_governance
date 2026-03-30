@@ -1,0 +1,30 @@
+{
+  "version": "2.3",
+  "description": "Declarative deploy contract: shared/ -> live ~/.claude/",
+  "line_endings": "lf",
+  "text_extensions": [".md", ".py", ".json", ".sh", ".txt", ".js"],
+  "mappings": [
+    {"src": "shared/CLAUDE.md",                         "dst": "CLAUDE.example.md"},
+    {"src": "shared/policy-limits.json",                "dst": "policy-limits.json", "optional": true},
+    {"src": "shared/rules/*.md",                        "dst": "rules/",            "glob": true},
+    {"src": "shared/reference/*.md",                    "dst": "reference/",         "glob": true},
+    {"src": "shared/archive/*.md",                      "dst": "archive/",           "glob": true},
+    {"src": "shared/templates/*",                       "dst": "templates/",         "glob": true},
+    {"src": "shared/skills/**/SKILL.md",                "dst": "skills/",            "rglob": true},
+    {"src": "shared/commands/*.md",                     "dst": "commands/",          "glob": true},
+    {"src": "hooks/w11/*",                              "dst": "hooks/",             "glob": true},
+    {"src": "settings/w11/settings.example.json",       "dst": "settings.example.json"},
+    {"src": "bin/w11/*",                                "dst": "bin/",               "glob": true}
+  ],
+  "tombstones": [
+    "rules/taxonomy.md",
+    "rules/manifesto-governance.md",
+    "rules/manifesto-governance-v1.md"
+  ],
+  "reverse_sync": [
+    {"live": "hooks/pretool-guardrails.py",   "src": "hooks/w11/pretool-guardrails.py"},
+    {"live": "hooks/check-model-tier.py",     "src": "hooks/w11/check-model-tier.py"},
+    {"live": "hooks/session-end.py",          "src": "hooks/w11/session-end.py"},
+    {"live": "reference/enforcement.md",      "src": "shared/reference/enforcement.md"}
+  ]
+}

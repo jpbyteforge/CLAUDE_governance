@@ -47,12 +47,15 @@ description: Bidirectional map between governance rules and their enforcement me
 |--------|--------|-----------|------|
 | Model tier recommendation | enforced | check-model-tier.py classifies prompts, suggests tier | `hooks/check-model-tier.py` |
 | Subagent quota (max 10 writes) | enforced | pretool-guardrails.py tracks agent spawns in tempfile | `hooks/pretool-guardrails.py` |
-| Bash tool restrictions | enforced | pretool-guardrails.py blocks cat, grep, find, etc. | `hooks/pretool-guardrails.py` |
+| Bash tool restrictions | enforced | pretool-guardrails.py blocks cat, grep, find, sed -i, awk as first command; allows grep/head/tail/awk after pipes (filtering stdout). `tail -f`/`--follow` exempted (streaming). | `hooks/pretool-guardrails.py` |
+| Subagent quota atomicity | enforced | Lock file with `O_CREAT\|O_EXCL` prevents race condition on parallel agent launches | `hooks/pretool-guardrails.py` |
+| Governance version check | enforced | Runs once per session (sentinel file), not on every tool call | `hooks/pretool-guardrails.py` |
 
 ## Known Gaps (Honest Assessment)
 
 | Gap | Severity | Notes |
 |-----|----------|-------|
+| FN-1: Pipe-prefix bypass | Low | `true \| grep pattern file` bypasses first-segment check; threat model is accidental misuse, not adversarial |
 | No automated ADR process | Low | INVARIANT-5 requires records but no template or workflow enforced |
 | No memory staleness check | Medium | RULE-12 is convention-only; stale memory can cause wrong actions |
 | No epistemic marker linter (global) | Low | Only EEM has V9-V14; other projects would need their own |

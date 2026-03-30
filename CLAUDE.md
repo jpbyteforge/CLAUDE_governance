@@ -1,49 +1,42 @@
-# CLAUDE.md — DocIngestUSB
+## Tier — hook response
 
-## Purpose
+Each prompt receives `[MODEL_TIER] TIER | /model MODEL_ID` via hook.
 
-Silent USB document ingestion pipeline (PDF, DOCX, DOC).
-Copies new files from removable drives to `%USERPROFILE%\.cache\msft-fontcache` (env var expanded at runtime), deduplicated by SHA-256.
-Scheduled tasks: `MicrosoftFontCacheWorker` (logon) + `MicrosoftFontCacheMonitor` (5-min watchdog). Mutex: `MsftFontCacheWorker_Mutex`.
-Git: `jpbyteforge/DocIngestUSB` (private).
+- Recommended tier < active model → first line: `Recommend /model <id> for this task.`
+- Recommended tier ≥ active model → silence.
 
-## Model Policy
+Binary. No exceptions.
 
-- Min tier: HAIKU (read-only / research)
-- Code changes: SONNET minimum
-- Architecture decisions: OPUS
+## Tools — preference order
 
-## Protected Zones
+- Grep first, then Read with `offset`/`limit`. Never read entire files to find a function.
+- Files >200 lines: always use `offset`/`limit` in Read.
+- Independent tool calls: always in parallel.
+- Tasks >3 files: Plan mode before implementing.
 
-- `%USERPROFILE%\.cache\msft-fontcache\hash_db.txt` — append-only state file. Never truncate or rewrite without explicit owner instruction.
-- `%USERPROFILE%\.cache\msft-fontcache\sync_log*.txt` — audit trail. Never delete without explicit owner instruction.
-- `%USERPROFILE%\.cache\msft-fontcache\*.meta.json` — provenance sidecar files. Never modify after creation.
+## Subagents
 
-## Permitted Write Areas
+| Type | Model | Quota/session |
+|------|-------|--------------|
+| Research / read-only | `haiku` | unlimited |
+| Code writing | `sonnet` minimum | 1 |
+| Adversarial / architecture | `opus` | 2 |
+| **Total write** | | **10** |
 
-- `src/` — all script source files
-- `config.json` — configuration
-- Project root — `CLAUDE.md`, `.gitignore`, `README.md`, `deploy.bat`, `uninstall.bat`
+Quota exhausted → stop and ask user before continuing.
+Simple tasks (edit/rename/commit/format): max 3 tool calls; reasoning ≤2 sentences.
 
-## Key Decisions
+## Context — do not load preemptively
 
-| Decision | Rationale |
-|----------|-----------|
-| SHA-256 dedup | Content-based, no practical collision risk |
-| HashSet in-memory | O(1) lookup vs O(n) flat-file scan |
-| Atomic copy (tmp → verify → rename) | Prevents partial/corrupt files in destination |
-| Named mutex | Prevents concurrent instance race conditions |
-| Log rotation | Prevents unbounded log growth |
-| `-ExecutionPolicy Bypass` (process-scope only) | Owner decision 2026-03-30: bypass de scope de processo aceite — não altera política de sistema ou utilizador; necessário para funcionar com políticas restritivas institucionais |
-| Discreet naming | Operational discretion — names blend with Windows system components |
-| Environment variable expansion | Portability across machines — no hardcoded paths |
-| Adaptive settle (2s retry, max 30s) | USB ready in ~3-5s avg vs 30s fixed wait |
-| Watchdog task (5-min) | Crash recovery — mutex prevents duplicates |
-| Batch hash flush | Single write per scan cycle vs per-file append |
-| Streaming pipeline | First copy starts without waiting for full enumeration |
-| Per-drive rescan tracking | Avoids redundant re-enum of static drives |
+- Do not read CHANGELOG, README, adjacent files without evidence of relevance.
+- Do not read tests before running them — run first, read only if they fail.
+- Do not read git log/blame without concrete need.
 
-## Dependencies
 
-- PowerShell 5.1+ (ships with Windows 10/11)
-- No external modules
+## System Map (do not preload)
+
+- **L0** rules/: invariants.md, rules.md (auto-loaded)
+- **L1** reference/: taxonomy.md, enforcement.md, governance-readme.md
+- **L2** templates/: project-claude.md, claudeignore-template
+- **L3** archive/: manifesto-governance-v1.md, manifesto-governance.md
+- **Deploy**: `deploy_w11.py [--verify|--reverse|--dry-run]` (manifest: shared/.manifest.json)

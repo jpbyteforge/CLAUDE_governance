@@ -3,8 +3,10 @@ No LLM. Enforces: dedicated tools over bash, Edit over Write, Sonnet+ agent quot
 """
 import sys
 import json
+import os
 import re
 import tempfile
+import time
 from pathlib import Path
 
 
@@ -12,52 +14,100 @@ def block(msg: str) -> None:
     print(msg, file=sys.stderr)
     sys.exit(2)
 
-_COMPLEX     = re.compile(r"[|]|&&|;")
-_BASH_READ   = re.compile(r"^(cat|head|tail)\b")
-_BASH_GREP   = re.compile(r"^(grep|rg|egrep|fgrep)\b")
-_BASH_FIND   = re.compile(r"^find\b")
+_COMPLEX      = re.compile(r"[|]|&&|;")
+_BASH_READ    = re.compile(r"^(cat|head|tail)\b")
+_TAIL_FOLLOW  = re.compile(r"^tail\s+(-\S*f\S*|--follow)\b")
+_BASH_GREP    = re.compile(r"^(grep|rg|egrep|fgrep)\b")
+_BASH_FIND    = re.compile(r"^find\b")
 _BASH_FIND_OK = re.compile(r"-delete|-exec|xargs")
-_BASH_SED    = re.compile(r"^sed\s+(-i|--in-place)\b")
-_BASH_AWK    = re.compile(r"^awk\b")
+_BASH_SED     = re.compile(r"^sed\s+(-i|--in-place)\b")
+_BASH_AWK     = re.compile(r"^awk\b")
 _READONLY_AGENTS = {"Explore"}
 
 
 def check_bash(command: str) -> None:
     command = command.strip()
-    # Strip quoted strings to avoid false positives on keywords inside quotes
+    # P2: Strip quoted strings — handles \" escapes inside double-quotes
     try:
-        stripped = re.sub(r"'[^']*'", '""', re.sub(r'"[^"]*"', '""', command))
+        if len(command) > 4000:
+            stripped = command
+        else:
+            stripped = re.sub(r"'[^']*'", "''",
+                        re.sub(r'"(?:[^"\\]|\\.)*"', '""', command))
     except Exception:
         stripped = command
     # Split on unquoted pipes, logical operators, semicolons
     segments = re.split(r'\s*(?:\|{1,2}|&&|;)\s*', stripped)
-    for segment in segments:
+    # P1: Enforce read/grep/awk only on first segment (i==0).
+    # After a pipe these filter stdout — legitimate, no tool equivalent.
+    # find and sed -i always operate on files, enforced at every position.
+    # Known gap (FN-1): `true | grep pattern file` bypasses the check.
+    for i, segment in enumerate(segments):
         segment = segment.strip()
         if not segment:
             continue
         first = segment.split()[0] if segment.split() else ""
-        if _BASH_READ.match(segment):
-            block(f"Blocked: use Read instead of '{first}'.")
-        if _BASH_GREP.match(segment):
-            block(f"Blocked: use Grep instead of '{first}'.")
+        if i == 0:
+            # P3: Allow tail -f / tail --follow (streaming, no Read equivalent)
+            if _BASH_READ.match(segment) and not _TAIL_FOLLOW.match(segment):
+                block(f"Blocked: use Read instead of '{first}'.")
+            if _BASH_GREP.match(segment):
+                block(f"Blocked: use Grep instead of '{first}'.")
+            if _BASH_AWK.match(segment):
+                block("Blocked: use Grep or Edit instead of awk.")
         if _BASH_FIND.match(segment) and not _BASH_FIND_OK.search(segment):
             block("Blocked: use Glob instead of find.")
         if _BASH_SED.match(segment):
             block("Blocked: use Edit instead of 'sed -i'.")
-        if _BASH_AWK.match(segment):
-            block("Blocked: use Grep or Edit instead of awk.")
 
 
 def check_write(file_path: str) -> None:
+    # P7: Early-exit at threshold instead of reading entire file
     p = Path(file_path)
     if not p.exists():
         return
+    THRESHOLD = 50
     try:
         with p.open(encoding="utf-8", errors="ignore") as fh:
-            lines = sum(1 for _ in fh)
-        if lines > 50:
-            block(f"Blocked: existing file with {lines} lines. Use Edit instead of Write.")
+            for i, _ in enumerate(fh, 1):
+                if i > THRESHOLD:
+                    block(f"Blocked: existing file exceeds {THRESHOLD} lines. Use Edit instead of Write.")
     except Exception:
+        pass
+
+
+def _acquire_lock(lock_path: Path, timeout: float = 2.0) -> int:
+    """Acquire an exclusive lock file atomically. Returns fd or -1."""
+    deadline = time.monotonic() + timeout
+    while True:
+        try:
+            fd = os.open(str(lock_path), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            # Write PID for stale-lock detection
+            os.write(fd, str(os.getpid()).encode())
+            return fd
+        except FileExistsError:
+            # Check if holding process is still alive
+            try:
+                pid = int(lock_path.read_text().strip())
+                os.kill(pid, 0)
+            except (ValueError, OSError, PermissionError):
+                # Process dead or PID unreadable — stale lock
+                try:
+                    lock_path.unlink()
+                except OSError:
+                    pass
+                continue
+            if time.monotonic() > deadline:
+                return -1  # fail open on timeout
+            time.sleep(0.05)
+
+
+def _release_lock(lock_path: Path, fd: int) -> None:
+    if fd >= 0:
+        os.close(fd)
+    try:
+        lock_path.unlink()
+    except OSError:
         pass
 
 
@@ -76,21 +126,37 @@ def check_agent(tool_input: dict, session_id: str) -> None:
     cost       = 2 if "opus" in model_l else 1
     max_write  = 10
     count_file = Path(tempfile.gettempdir()) / f"claude-agents-write-{session_id}"
-    count = 0
-    if count_file.exists():
-        try:
-            count = int(count_file.read_text().strip())
-        except Exception:
-            count = 0
-    if count + cost > max_write:
-        block(f"Insufficient write subagent quota ({count}/{max_write}, cost={cost}). Use Read/Glob/Grep directly.")
-    count_file.write_text(str(count + cost))
+    # P5: Atomic lock to prevent race condition on parallel agent launches
+    lock_path  = count_file.with_suffix(".lock")
+    fd = _acquire_lock(lock_path)
+    try:
+        count = 0
+        if count_file.exists():
+            try:
+                count = int(count_file.read_text().strip())
+            except Exception:
+                count = 0
+        if count + cost > max_write:
+            block(f"Insufficient write subagent quota ({count}/{max_write}, cost={cost}). Use Read/Glob/Grep directly.")
+        count_file.write_text(str(count + cost))
+    finally:
+        _release_lock(lock_path, fd)
 
 
-def check_governance_version() -> None:
-    """Warn if governance files in rules/ have mismatched versions."""
+def check_governance_version(session_id: str) -> None:
+    """Warn if governance files in rules/ have mismatched versions.
+    P6: Runs at most once per session via sentinel file."""
+    if not session_id:
+        return
+    sentinel = Path(tempfile.gettempdir()) / f"claude-gov-checked-{session_id}"
+    if sentinel.exists():
+        return
     rules_dir = Path.home() / ".claude" / "rules"
     if not rules_dir.exists():
+        try:
+            sentinel.touch()
+        except Exception:
+            pass
         return
     versions = {}
     for f in rules_dir.glob("*.md"):
@@ -105,7 +171,11 @@ def check_governance_version() -> None:
     unique = set(versions.values())
     if len(unique) > 1:
         detail = ", ".join(f"{k}={v}" for k, v in sorted(versions.items()))
-        print(f"⚠️ Governance version mismatch: {detail}", file=sys.stderr)
+        print(f"Governance version mismatch: {detail}", file=sys.stderr)
+    try:
+        sentinel.touch()
+    except Exception:
+        pass
 
 
 def main() -> None:
@@ -125,8 +195,8 @@ def main() -> None:
     elif tool_name == "Agent":
         check_agent(tool_input, session_id)
 
-    # Run governance integrity check on first tool call (lightweight)
-    check_governance_version()
+    # P6: Run governance integrity check once per session
+    check_governance_version(session_id)
 
     sys.exit(0)
 

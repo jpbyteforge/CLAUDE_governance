@@ -11,14 +11,19 @@ description: Fecha sessão — verifica integridade, regista memória e reporta 
 
 Reporta quebras como `[LINK QUEBRADO] origem → destino`. Não actua — só reporta.
 
-## 2. Pendentes
-- `git status --short` nos repos tocados nesta sessão
+## 2. Deploy drift
+- Executar `python ~/.claude/deploy_w11.py --verify` e reportar resultado
+- Se drift > 0: sugerir `python deploy_w11.py --reverse` para ficheiros em reverse_sync
+- Advisory — não bloqueia /wrap
+
+## 3. Pendentes
+- `git status --short` nos repos tocados nesta sessão (incluindo `~/.claude/`)
 - Tasks/todos abertos sem completar
 - Planos criados mas não executados
 
-## 3. Memória
+## 4. Memória
 Actualiza `memory/` e/ou `CLAUDE.md` do projecto activo. Só o que mudou.
 Sem duplicar código ou git. Sem detalhe técnico excessivo.
 
-## 4. Sumário
+## 5. Sumário
 Lista compacta: o que foi actualizado e o que fica pendente para a próxima sessão.
