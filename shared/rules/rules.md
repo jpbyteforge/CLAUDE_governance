@@ -39,7 +39,8 @@ R11 Session Integrity
 R12 Memory Verification
   WHEN action depends on memory naming {file, path, function, resource}
   REQUIRE verify existence NOW
-  DEFAULT if missing -> update/remove memory. Proceed only if verified.
-  # "Memory says X exists" != "X exists"
+  REQUIRE path_resolution_check: if memory names a path, verify it resolves from current project context
+  DEFAULT if missing or unresolvable -> update/remove memory. Proceed only if verified.
+  # "Memory says X exists" != "X exists". "Memory path resolves" must also be verified.
 
 Escape: no matching rule -> ASK owner + INV-3 (fail-closed). ADR if precedent-setting.
