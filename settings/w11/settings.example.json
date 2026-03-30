@@ -18,7 +18,13 @@
     "deny": [
       "Read(./.env)",
       "Read(./.env.*)",
-      "Read(./secrets/**)"
+      "Read(./secrets/**)",
+      "Write(~/.claude/CLAUDE.md)",
+      "Write(~/.claude/rules/**)",
+      "Write(~/.claude/hooks/**)",
+      "Edit(~/.claude/CLAUDE.md)",
+      "Edit(~/.claude/rules/**)",
+      "Edit(~/.claude/hooks/**)"
     ]
   },
   "hooks": {

@@ -25,9 +25,21 @@ _policy = REPO / "shared" / "policy-limits.json"
 if _policy.exists():
     deploy(_policy, TARGET / "policy-limits.json")
 
-# Rules
-deploy(REPO / "shared" / "rules" / "manifesto-governance.md",
-       TARGET / "rules" / "manifesto-governance.md")
+# Rules (v2.2: invariants + rules + inline glossary; manifestos in archive/)
+for f in (REPO / "shared" / "rules").glob("*.md"):
+    deploy(f, TARGET / "rules" / f.name)
+
+# Reference (on-demand, not auto-loaded)
+for f in (REPO / "shared" / "reference").glob("*.md"):
+    deploy(f, TARGET / "reference" / f.name)
+
+# Archive (rollback only)
+for f in (REPO / "shared" / "archive").glob("*.md"):
+    deploy(f, TARGET / "archive" / f.name)
+
+# Templates
+for f in (REPO / "shared" / "templates").glob("*"):
+    deploy(f, TARGET / "templates" / f.name)
 
 # Skills
 for f in (REPO / "shared" / "skills").rglob("SKILL.md"):
