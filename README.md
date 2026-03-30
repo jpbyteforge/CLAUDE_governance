@@ -1,105 +1,106 @@
-# CLAUDE_governance
+# DocIngestUSB
 
-Cross-platform governance configuration for [Claude Code](https://claude.ai/claude-code) — deterministic hooks, model tier management, token economy guardrails, and operational audit skills.
+Silent USB document ingestion for Windows. Monitors removable drives and copies new PDF, DOCX, and DOC files to a local folder — deduplicated by content hash (SHA-256).
 
-Works on **WSL/Linux** (bash) and **Windows 11** (Python 3.13 native).
+## Features
 
-## What this is
+- **Auto-detection** — detects USB insertion via lightweight polling (no WMI events)
+- **Content dedup** — SHA-256 hash prevents duplicate copies, even with different filenames
+- **Atomic copy** — temp file + hash verify + rename; no partial files on eject
+- **Non-blocking I/O** — USB can be safely ejected at any moment
+- **Zero window** — VBScript launcher ensures no console flash
+- **Provenance metadata** — `.meta.json` sidecar per file (source path, USB serial, timestamps)
+- **Log rotation** — structured audit log with configurable size cap
+- **Watchdog** — secondary scheduled task restarts the process if it dies (admin path only)
+- **No-admin fallback** — if `schtasks` requires elevation, persists via user Startup folder
+- **Portable** — environment variable expansion; no hardcoded paths
 
-A single source of truth for governing Claude Code behavior across machines and operating systems. Instead of managing separate configs per platform, this repo holds everything in one place and deploys to the right locations.
+## Quick Start
 
-**Core principles** (from the [governance manifesto](shared/rules/manifesto-governance.md)):
-- AI is a regulated component, not an autonomous agent
-- Documents are law — deterministic checks before AI action
-- Fail-closed on ambiguity
-- Human-in-the-loop for critical actions
-- Minimum context, maximum results
+### Deploy (one command)
 
-## Structure
-
-```
-shared/                     # OS-agnostic — deployed to both platforms
-├── CLAUDE.md               # User-level governance (model tiers, token economy)
-├── policy-limits.json      # Session-level quotas
-├── rules/                  # Auto-loaded governance rules
-│   └── manifesto-governance.md
-├── commands/               # On-demand skills (loaded when invoked)
-│   ├── audit-turnaround.md # Operational audit protocol
-│   ├── contraditorio.md    # Adversarial analysis
-└── skills/
-    └── neon-postgres/      # Neon Serverless Postgres guide
-
-hooks/                      # Platform-specific enforcement
-├── wsl/                    # Bash scripts
-│   ├── check-model-tier.sh
-│   ├── resolve-model-policy.sh
-│   ├── pretool-guardrails.sh
-│   └── session-start-model.sh
-└── w11/                    # Python 3.13 (zero WSL dependency)
-    ├── check-model-tier.py
-    └── pretool-guardrails.py
-
-settings/                   # Platform-specific Claude Code config
-├── wsl/
-└── w11/
-
-bin/                        # Utility scripts
-├── wsl/token-economy-report.sh
-└── w11/token-economy-report.py
-```
-
-## Hooks
-
-### check-model-tier (UserPromptSubmit)
-Classifies prompt complexity and recommends the appropriate model tier. Deterministic regex matching — no LLM, <10ms. Supports local overrides via `## Model Policy` in project CLAUDE.md files.
-
-| Tier | Model | When |
-|------|-------|------|
-| HAIKU | `claude-haiku-4-5-20251001` | Questions, formatting, commits, boilerplate |
-| SONNET | `claude-sonnet-4-6` | Implementation, debug, refactor, review |
-| OPUS | `claude-opus-4-6` | Multi-system architecture, governance, trade-offs |
-
-### pretool-guardrails (PreToolUse)
-Enforces token economy rules before each tool call:
-- **Dedicated tools over Bash**: blocks `cat`→Read, `grep`→Grep, `find`→Glob, `sed -i`→Edit
-- **Edit over Write**: existing files >50 lines must use Edit (sends diff, not full file)
-- **Subagent quota**: max 10 write-subagents per session
-
-## Deploy
-
-**WSL/Linux:**
-```bash
-./deploy.sh            # Deploy to ~/.claude/
-./deploy.sh --dry-run  # Preview without copying
-```
-
-**Windows 11:**
 ```cmd
-python deploy_w11.py            # Deploy to %USERPROFILE%\.claude\
-python deploy_w11.py --dry-run
+deploy.bat
 ```
 
-Both scripts copy shared files to `~/.claude/` and platform-specific files from the appropriate subdirectory.
+Creates a hidden local folder, copies scripts + config, then attempts to register two scheduled tasks (logon + 5-minute watchdog). Starts immediately.
 
-## Governance model
+**No admin?** If `schtasks` is blocked by permissions, `deploy.bat` falls back automatically: copies `launcher.vbs` to the user Startup folder (`%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\`) and launches directly. No watchdog task in this path — `sync.ps1` runs as a persistent loop and does not need one.
+
+### Uninstall
+
+```cmd
+uninstall.bat
+```
+
+Stops the process, removes both tasks, deletes scripts. Ingested files are kept.
+
+### Manual test
+
+```powershell
+powershell -NoProfile -File .\src\sync.ps1
+```
+
+Insert a USB drive. Files appear in the destination folder within seconds. `Ctrl+C` to stop.
+
+## Configuration
+
+Edit `config.json` before deploying:
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `destinationPath` | `%USERPROFILE%\.cache\msft-fontcache` | Target folder (supports env vars) |
+| `extensions` | `.pdf .docx .doc` | File types to ingest |
+| `sleepSeconds` | `30` | Max settle time after USB insertion |
+| `rescanMinutes` | `5` | Re-scan interval for already-scanned drives |
+| `log.maxSizeMB` | `10` | Max log size before rotation |
+| `log.retentionCount` | `3` | Number of rotated logs to keep |
+| `fileSizeCapMB` | `500` | Skip files larger than this |
+
+## How It Works
 
 ```
-manifesto (doctrine, read-only)
-  └→ protocol ({governance}/CLAUDE.md)
-       └→ portfolio (projects/CLAUDE.md)
-            └→ project ({proj}/CLAUDE.md)
+[Poll drive letters every 5s]
+         |
+   New USB detected?
+         |
+   [Adaptive settle: 2s retries, max 30s]
+         |
+   [Stream: enumerate → hash → atomic copy]
+         |
+   [Batch flush hash DB + log]
+         |
+   [Sleep 5s → loop]
 ```
 
-Each level can restrict but not relax the level above. The manifesto principles are distilled into [manifesto-governance.md](shared/rules/manifesto-governance.md) — a 34-line Claude-optimized rules file that auto-loads in every session, replacing the full 189-line manifesto.
+1. **Detection** — compares current removable drives against known set (zero disk I/O)
+2. **Settle** — retries access every 2s until drive is ready (avg ~3-5s, max 30s)
+3. **Streaming scan** — `Get-ChildItem` pipes directly into hash + copy (no array materialization)
+4. **Dedup** — in-memory `HashSet<string>` with O(1) lookups; persisted to flat file in batch
+5. **Atomic copy** — write to `.tmp`, verify hash, rename; corrupt files auto-cleaned
+6. **Metadata** — JSON sidecar records source path, USB serial, original timestamps, hostname
 
-## Token economy
+## Project Structure
 
-Every design decision optimizes for minimal context window usage:
-- Governance baseline: **~1,930 tokens** per session (down from ~4,400)
-- Manifesto: 189 lines → 34 lines (-82%)
-- Protocol: 96 lines → 48 lines (-50%)
-- Skills load on-demand only
+```
+DocIngestUSB/
+├── deploy.bat           # Full deploy: copy scripts + register tasks (with no-admin fallback)
+├── uninstall.bat        # Clean removal (tasks + Startup folder entry)
+├── config.json          # All tunables
+└── src/
+    ├── sync.ps1         # Core engine (~420 lines, persistent loop)
+    ├── launcher.vbs     # Zero-window process launcher (logs invocation to launcher_log.txt)
+    ├── install.ps1      # Task-only re-installer (scripts already deployed)
+    └── diagnose.bat     # Double-click diagnostic: checks installation, logs, execution policy
+```
+
+## Requirements
+
+- Windows 10/11
+- PowerShell 5.1+ (ships with Windows)
+- No external modules
+- Admin rights not required (Startup folder fallback)
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+Private repository.
