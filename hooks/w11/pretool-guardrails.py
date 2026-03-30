@@ -178,6 +178,42 @@ def check_governance_version(session_id: str) -> None:
         pass
 
 
+
+
+def check_push(command: str) -> None:
+    """Advisory pre-push checks. Warns to stderr, never blocks (exits 0)."""
+    import subprocess
+    if not re.search(r'\bgit\s+push\b', command):
+        return
+    warnings = []
+    try:
+        result = subprocess.run(
+            ["git", "ls-files"], capture_output=True, text=True, timeout=5
+        )
+        sensitive = [
+            line for line in result.stdout.splitlines()
+            if re.search(r'(?i)(config\.json|secret|credentials|\.env\b|api[-_]?key)', line)
+        ]
+        if sensitive:
+            warnings.append(f"Sensitive files tracked: {', '.join(sensitive)}")
+    except Exception:
+        pass
+    deploy_script = Path.home() / ".claude" / "deploy_w11.py"
+    if deploy_script.exists():
+        try:
+            result = subprocess.run(
+                ["python", str(deploy_script), "--verify"],
+                capture_output=True, text=True, timeout=10
+            )
+            if result.returncode != 0:
+                warnings.append("Deploy drift detected - run deploy_w11.py --verify before push")
+        except Exception:
+            pass
+    if warnings:
+        print("[push-advisory]", file=sys.stderr)
+        for w in warnings:
+            print(f"  WARN: {w}", file=sys.stderr)
+
 def main() -> None:
     try:
         data = json.loads(sys.stdin.read())
@@ -190,6 +226,7 @@ def main() -> None:
 
     if tool_name == "Bash":
         check_bash(tool_input.get("command", ""))
+        check_push(tool_input.get("command", ""))
     elif tool_name == "Write":
         check_write(tool_input.get("file_path", ""))
     elif tool_name == "Agent":
