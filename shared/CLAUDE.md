@@ -26,17 +26,26 @@ Binary. No exceptions.
 Quota exhausted → stop and ask user before continuing.
 Simple tasks (edit/rename/commit/format): max 3 tool calls; reasoning ≤2 sentences.
 
-## Push — advisory checklist
-
-Before pushing governance repo:
-1. `deploy_w11.py --verify` exits 0 (no drift)
-2. `git ls-files | grep -iE 'config|secret|key|\.env'` → empty
-3. `git log --oneline origin/main..HEAD` reviewed
-
-Hook warns on (1) and (2). Owner decides to push.
-
 ## Context — do not load preemptively
 
 - Do not read CHANGELOG, README, adjacent files without evidence of relevance.
 - Do not read tests before running them — run first, read only if they fail.
 - Do not read git log/blame without concrete need.
+
+
+## Push — advisory checklist
+
+Before pushing governance repo:
+1. `deploy_w11.py --verify` exits 0 (no drift)
+2. `git ls-files | grep -iE 'config|secret|key|\.env'` -> empty
+3. `git log --oneline origin/main..HEAD` reviewed
+
+Hook warns on (1) and (2). Owner decides to push.
+
+## System Map (do not preload)
+
+- **L0** rules/: invariants.md, invariants.yaml, rules.md (auto-loaded)
+- **L1** reference/: taxonomy.md, enforcement.md, governance-readme.md
+- **L2** templates/: project-claude.md, claudeignore-template
+- **L3** archive/: manifesto-governance-v1.md, manifesto-governance.md
+- **Deploy**: `deploy_w11.py [--verify|--reverse|--dry-run]` (manifest: shared/.manifest.json)

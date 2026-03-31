@@ -1,0 +1,57 @@
+version: 1
+date: 2026-03-31
+scope: global
+type: structural-invariants
+description: >
+  Propriedades estruturais sempre verdadeiras.
+  Complement to invariants.md (prose intent). This file = checkable structure + severity.
+  Violation always = BLOCK + incident_log entry with invariant field populated.
+
+definitions:
+  non_trivial_actions:
+    - write
+    - delete
+    - external_call
+    - governance_edit
+
+invariants:
+
+  - id: INV-001
+    name: no_write_outside_workspace
+    description: >
+      Nenhuma operacao de escrita pode ocorrer fora de areas explicitamente
+      permitidas no project CLAUDE.md, sem instrucao humana directa documentada.
+    violation:
+      severity: CRITICAL
+      action: BLOCK
+      log: true
+    derives: [INV-1, INV-3, R4]
+
+  - id: INV-002
+    name: no_self_permission_escalation
+    description: >
+      O agente nao pode conceder a si proprio permissoes ou autoridade
+      nao explicitamente delegadas por instrucao humana, ADR, ou sovereign doc.
+    violation:
+      severity: CRITICAL
+      action: BLOCK
+      log: true
+    derives: [INV-1, INV-5]
+
+  - id: INV-003
+    name: all_nontrivial_actions_have_authority_basis
+    description: >
+      Toda a accao listada em definitions.non_trivial_actions deve ter base de
+      autoridade identificavel (user_instruction, ADR, CLAUDE.md, rules/*).
+      Ausencia = bloqueio. Sem improvisacao.
+    violation:
+      severity: HIGH
+      action: BLOCK
+      log: true
+    derives: [INV-1, INV-3, A1, A3]
+
+notes:
+  - Verificar contra incident_log.jsonl em cada revisao E2.
+  - Adicoes requerem ADR + owner review (R10).
+  - invariants.md = intencao em prosa; este ficheiro = estrutura verificavel.
+  - Repeated identical WARN events (>5 in same session) must be aggregated in E2 review.

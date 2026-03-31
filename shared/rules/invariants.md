@@ -44,3 +44,14 @@ INV-7 Evolution
   rules.review = periodic (min trimestral)
   experimental_rule REQUIRES sunset_clause
   # Rules improve over time. Paralysis is itself failure.
+
+## Structural verification
+
+Invariants above as prose (intent + rationale).
+Machine-readable structure + severity: see rules/invariants.yaml.
+
+INV-001 maps to INV-1 + INV-3 + R4  (no write outside permitted areas)
+INV-002 maps to INV-1 + INV-5        (no self-elevation)
+INV-003 maps to INV-1 + INV-3        (authority basis for non_trivial_actions)
+
+Non-trivial actions defined in invariants.yaml definitions.non_trivial_actions.
