@@ -30,9 +30,11 @@ Agregar eventos do incident_log desta sessao:
   override: N
   drift: N
 
-  top_rules: [lista das regras mais invocadas]
+  top_rules: (top 3, ordem desc por frequencia)
+  - REGRA: N
 
 Input directo para mini-E2. Se todos zero: OK.
+(sessao = eventos desde ultimo /wrap)
 
 ## 4. Deploy drift
 - Executar `python ~/.claude/deploy_w11.py --verify` e reportar resultado
