@@ -70,7 +70,12 @@ Do not apply to: pure logical derivations, internal system decisions, architectu
 
    **Strict mode** (academic/legal contexts — activate when user requests or when precision is critical):
    If ANY core claim ≠ SOURCE-VERIFIED → verdict cannot be VALID.
-   Core claim = any claim that, if wrong, invalidates the argument's main conclusion.
+   Core claim = any claim that meets one or more of the following:
+   - appears in the conclusion
+   - is causal or mechanistic ("X causes Y", "X enables Y")
+   - carries quantification ("most", "significant", "primarily", "always")
+   - is referenced by other claims (dependency node)
+   If wrong, it invalidates the argument's main conclusion.
    In strict mode, PARTIAL core claims force verdict to PARTIAL minimum.
 
    If PARTIAL or INVALID:
