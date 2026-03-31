@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "incident_log_entry",
+  "description": "Governance event record. Append-only. No content payloads.",
+  "type": "object",
+  "required": ["ts", "type", "rule", "action", "actor"],
+  "properties": {
+    "ts":         { "type": "string", "format": "date-time" },
+    "type":       { "type": "string", "enum": ["block", "warn", "override", "drift"] },
+    "severity":   { "type": "string", "enum": ["low", "medium", "high", "critical"],
+                    "description": "Invariant violations must be high or critical." },
+    "rule":       { "type": "string", "description": "e.g. R4, INV-001, A3" },
+    "invariant":  { "type": "string",
+                    "description": "Required when type=block and invariant was violated." },
+    "action":     { "type": "string" },
+    "resource":   { "type": "string", "description": "Path pattern only. No file content." },
+    "reason":     { "type": "string" },
+    "resolution": { "type": "string" },
+    "actor":      { "type": "string", "enum": ["agent", "user"] }
+  },
+  "additionalProperties": false
+}
