@@ -12,7 +12,11 @@ Se qualquer ficheiro L0 em falta: reportar antes de continuar.
 
 ## 2. Estado herdado (ultimo /wrap)
 
-Ler session outcome do ultimo wrap (memory ou incident_log):
+Fonte unica (precedencia):
+  1. memory/project_governance_v2.md (session outcome persistido)
+  2. fallback: ultimo bloco em incident_log.jsonl
+
+
 
   pending:          [lista compacta do ultimo wrap]
   mode_next_session: [modo definido]
@@ -24,6 +28,7 @@ Se nao houver wrap anterior: NONE — sessao fresh.
 Verificar incident_log.jsonl (ultimas entradas):
 
   ultimo wrap: violations? → NO | YES (destacar)
+  Se incident_log vazio: assumir baseline limpo (0/0/0/0)
   block:    N
   warn:     N
   override: N
