@@ -10,12 +10,12 @@ Execute an adversarial rebuttal of the last relevant analysis or response in the
 
 ## When to apply
 
-Apply rebuttal only when:
-- The original analysis involves moderate or high-risk decisions
-- There are non-trivial trade-offs
-- The user explicitly requested `/contraditorio`
+Apply rebuttal only when ALL of the following:
+- Impact ≥ medium (structural, architectural, or governance decisions)
+- Irreversibility ≥ medium OR structural uncertainty is present
+- User explicitly requested `/contraditorio`
 
-Do not apply to: formatting, boilerplate, simple factual questions, mechanical tasks.
+Do not apply to: operational tasks (/wrap, /boot, scripting), reversible decisions, initial exploration, formatting, boilerplate, mechanical tasks.
 
 ## Execution
 
@@ -63,6 +63,14 @@ Reply in English.
 ## Reconciliation
 
 {synthesis in 3-5 points: where the original analysis holds, where it yields, and what changes in the final recommendation}
+
+---
+
+## Decision
+
+**Proceed** | **Proceed with constraints** | **Do not proceed**
+
+Rationale: (max 3 lines — what changed, what holds, what is still unverified)
 ```
 
 ## Operational principles
