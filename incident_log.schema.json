@@ -5,6 +5,8 @@
   "type": "object",
   "required": ["ts", "type", "rule", "action", "actor"],
   "properties": {
+    "sequence":      { "type": "integer", "description": "Ordinal within log file. Starts at 1." },
+    "previous_hash": { "type": "string",  "description": "SHA-256 of raw JSON string of previous entry. 'genesis' for first entry." },
     "ts":         { "type": "string", "format": "date-time" },
     "type":       { "type": "string", "enum": ["block", "warn", "override", "drift", "grounding_failure"] },
     "severity":   { "type": "string", "enum": ["low", "medium", "high", "critical"],
