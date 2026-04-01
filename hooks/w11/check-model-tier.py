@@ -17,7 +17,12 @@ TIER_MODEL = {
 _SONNET = re.compile(
     r"implementa|debug|corrig|refactor|testa|review|compar"
     r"|analisa(?![\s\S]*(impacto|risco|trade|sistem))|infra|setup|configur|deploy"
-    r"|backend|frontend|api|database|schema|query|optim|perform|secure",
+    r"|backend|frontend|api|database|schema|query|optim|perform|secure"
+    r"|cria[\s\S]{0,30}(plano|script|ficheiro|funcao|classe|modulo|hook|regra)"
+    r"|desenvolve|melhora[\s\S]{0,30}(sistem|codigo|hook|regra|classif)"
+    r"|aplica[\s\S]{0,30}(mudanca|altera|patch|fix|plano)"
+    r"|escreve[\s\S]{0,20}(codigo|code|script|funcao)"
+    r"|fecha[\s\S]{0,15}(sess|session)",
     re.IGNORECASE,
 )
 _OPUS = re.compile(
@@ -40,7 +45,18 @@ _OPUS = re.compile(
 )
 
 
+_HAIKU_FAST = re.compile(
+    r"^(o que [e\u00e9]|como funciona|qual [e\u00e9]|quais s[a\u00e3]o"
+    r"|lista[\s,]|explica[\s,]|descreve[\s,]|resume[\s,]|mostra[\s,]|diz-me"
+    r"|what is|how does|show me|list |explain |describe )",
+    re.IGNORECASE,
+)
+
+
 def classify(prompt: str) -> str:
+    # v3: fast-path HAIKU -- evita SONNET over-firing
+    if _HAIKU_FAST.match(prompt):
+        return "HAIKU"
     if _OPUS.search(prompt):
         return "OPUS"
     if _SONNET.search(prompt):
