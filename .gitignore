@@ -38,6 +38,8 @@ INSTALL.md
 # Runtime cache
 plugins/
 statsig/
+__pycache__/
+**/__pycache__/
 
 # Settings backup
 settings.json.bak
