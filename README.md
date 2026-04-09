@@ -1,6 +1,6 @@
 # CLAUDE_governance
 
-Cross-platform governance configuration for [Claude Code](https://claude.ai/claude-code) — deterministic hooks, model tier management, token economy guardrails, and operational audit skills.
+**v2.5** — Cross-platform governance configuration for [Claude Code](https://claude.ai/claude-code) — deterministic hooks, model tier management, token economy guardrails, and operational audit skills.
 
 Works on **WSL/Linux** (bash) and **Windows 11** (Python 3.13 native).
 
@@ -77,6 +77,7 @@ tools/                      # Developer tooling
 ├── verify_audit.py         # Hash-chain integrity check for incident_log
 └── create_wsl_task.ps1
 
+apply-model-routing-v3.py   # In-place migration helper for check-model-tier.py (--dry-run|--apply|--rollback)
 incident_log.jsonl          # Append-only governance event log (hash-chained)
 incident_log.schema.json    # Entry schema (block | warn | override | drift | grounding_failure)
 ```
@@ -99,8 +100,14 @@ Enforces token economy rules before each tool call:
 - **Subagent quota**: max 10 write-subagents per session, atomic via `O_CREAT|O_EXCL` lock
 - **Governance version check**: once per session (sentinel file), not per tool call
 
-### session-end (SessionEnd)
-Logs session close events and emits summary counters into `incident_log.jsonl`. Advisory — does not block.
+### session-end (Stop)
+Appends a `SESSION_END` record to `~/.claude/token-economy.log` on session close. Feeds `bin/token-economy-report`. Advisory — does not block.
+
+### config-audit (ConfigChange)
+Appends every settings/config mutation (source + file path + timestamp) to `~/.claude/config-audit.log`. Wired directly in `settings.example.json` — no dedicated script. Provides a cheap tamper trail for INV-2.
+
+### settings — permission denylist
+Both WSL and W11 `settings.example.json` ship a permissions denylist that blocks reads of `.env`, `.env.*`, `secrets/**` (and `~/.ssh/**` on WSL) before any hook runs. First line of defense; hooks are the second.
 
 See [shared/reference/enforcement.md](shared/reference/enforcement.md) for the full rule → mechanism map and known gaps.
 
